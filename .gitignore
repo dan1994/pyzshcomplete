@@ -1,0 +1,7 @@
+# Visual Studio Code
+.vscode/
+
+# Python
+*.pyc
+venv/
+.pytest_cache/
