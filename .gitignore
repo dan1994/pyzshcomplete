@@ -3,5 +3,4 @@
 
 # Python
 *.pyc
-venv/
 .pytest_cache/
