@@ -1,13 +1,12 @@
-#!/usr/bin/python3
-
-from argparse import ArgumentParser
 from sys import exit
+
+from pyzshcomplete.meta_parser import MetaParser
 
 
 class ZshCompleter:
 
     def __init__(self, parser):
-        self._parser = parser
+        self._parser = MetaParser(parser)
         self._arguments = []
 
     def complete(self):
@@ -17,20 +16,22 @@ class ZshCompleter:
 
     def _collect_arguments(self):
         positional_index = 1
-        for action in self._parser._actions:
-            if action.option_strings:
-                for option in action.option_strings:
+        for argument in self._parser.arguments:
+            if argument.is_optional:
+                for option in argument.options:
                     help_string = '[{}]'.format(
-                        action.help) if action.help is not None else ''
-                    if action.nargs == 0:
+                        argument.help) if argument.help is not None else ''
+                    if len(argument) == 0:
                         self._arguments.append(
                             '{}{}'.format(option, help_string))
                     else:
                         self._arguments.append(
-                            '{}+{}:{} arg:_files'.format(option, help_string, action.dest))
+                            '{}+{}:{} arg:_files'.format(option,
+                                                         help_string,
+                                                         argument.name))
             else:
                 self._arguments.append('{}:{}:_files'.format(
-                    positional_index, action.dest))
+                    positional_index, argument.name))
                 positional_index += 1
 
     def _print_arguments(self):
