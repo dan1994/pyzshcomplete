@@ -6,5 +6,5 @@ function _python_script() {
 
     local script=${words[1]}
     local arguments=(${(f)"$(ARGCOMPLETE=1 ${script} 2> /dev/null)"})
-    _arguments ${arguments[@]}
+    _arguments -s -w : ${arguments[@]}
 }
