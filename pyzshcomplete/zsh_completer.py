@@ -1,6 +1,6 @@
 from sys import exit
 
-from pyzshcomplete.argparse_parser_adapter import ArgparseParserAdapter
+from pyzshcomplete.adapters.argparse.parser_adapter import ArgparseParserAdapter
 
 
 class ZshCompleter:
