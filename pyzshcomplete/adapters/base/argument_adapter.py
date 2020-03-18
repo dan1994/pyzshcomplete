@@ -7,33 +7,41 @@ class ArgumentAdapter(metaclass=ABCMeta):
         self._parser = parser
         self._argument = argument
 
+    @property
     def is_positional(self):
-        return not self.is_optional()
+        return not self.is_optional
 
+    @property
     @abstractmethod
     def is_optional(self):
         return
 
+    @property
     @abstractmethod
     def name(self):
         return
 
+    @property
     @abstractmethod
     def options(self):
         return
 
+    @property
     @abstractmethod
     def subargument_count(self):
         return
 
+    @property
     @abstractmethod
     def help(self):
         return
 
+    @property
     @abstractmethod
     def is_exclusive(self):
         return
 
+    @property
     @abstractmethod
     def can_repeat(self):
         return
@@ -44,7 +52,7 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
     SUBARGUMENT_LOCATION = '+'
 
     def __str__(self):
-        if self.is_optional():
+        if self.is_optional:
             return self._optional_argument_to_string()
         return self._positional_argument_to_string()
 
@@ -60,7 +68,7 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
             )
 
     def _positional_argument_to_string(self):
-        if self.subargument_count() != 1:
+        if self.subargument_count != 1:
             raise NotImplementedError(
                 'A positional argument can currently be completed only once')
 
@@ -70,40 +78,40 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
         )
 
     def _exclusion_list_to_string(self):
-        if self.is_exclusive():
+        if self.is_exclusive:
             return '(* -)'
         # TODO - Missing exclusion of exclusive options for below cases
-        if self.can_repeat():
+        if self.can_repeat:
             return ''
-        return '({})'.format(' '.join(self.options()))
+        return '({})'.format(' '.join(self.options))
 
     def _options_to_string(self):
-        return '{{{}}}'.format(','.join(self.options()))
+        return '{{{}}}'.format(','.join(self.options))
 
     def _subargument_location_to_string(self):
-        if self.subargument_count() == 1:
+        if self.subargument_count == 1:
             return StringifyableArgumentAdapter.SUBARGUMENT_LOCATION
         return ''
 
     def _help_to_string(self):
-        if len(self.help()) > 0:
-            return '[{}]'.format(self.help())
+        if len(self.help) > 0:
+            return '[{}]'.format(self.help)
         return ''
 
     def _name_and_help_to_string(self):
-        if len(self.help()) > 0:
+        if len(self.help) > 0:
             return '{}\\ -\\ {}'.format(
-                self.name(),
-                self.help().replace(' ', r'\ ')
+                self.name,
+                self.help.replace(' ', r'\ ')
             )
-        return self.name()
+        return self.name
 
     def _subarguments_to_string(self):
-        if self.subargument_count() > 1:
+        if self.subargument_count > 1:
             raise NotImplementedError(
                 'An optional argument currently support up to one subargument')
 
-        if self.subargument_count() == 1:
+        if self.subargument_count == 1:
             return ' arg:{}'.format(self._completions_to_string())
         return ''
 
