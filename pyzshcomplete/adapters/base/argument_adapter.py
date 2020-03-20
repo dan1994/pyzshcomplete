@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from sys import stderr
 
 
 class ArgumentAdapterInterface(metaclass=ABCMeta):
@@ -70,9 +71,13 @@ class ArgumentAdapter(ArgumentAdapterInterface):
     SUBARGUMENT_EITHER_EQUAL_SIGN_SEPERATOR = '=-'
 
     def __str__(self):
-        if self.is_flag:
-            return self._flag_argument_to_string()
-        return self._positional_argument_to_string()
+        try:
+            if self.is_flag:
+                return self._flag_argument_to_string()
+            return self._positional_argument_to_string()
+        except Exception as e:
+            stderr.write('Skipping argument due to an exception: {}'.format(e))
+            return ''
 
     def _flag_argument_to_string(self):
         return '{exclusion_list}{can_repeat}{flags}{subargument_separator}'\
