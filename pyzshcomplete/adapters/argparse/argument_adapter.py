@@ -1,5 +1,6 @@
 from argparse import _HelpAction, _VersionAction, _AppendAction, \
     _AppendConstAction
+# _ExtendAction was added in python3.8
 try:
     from argparse import _ExtendAction
 except ImportError:
@@ -33,6 +34,12 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     @property
     def help(self):
         return self._argument.help
+
+    @property
+    def is_optional(self):
+        if self.is_positional:
+            return self._argument.nargs in ['?', '*']
+        return not self._argument.required
 
     @property
     def is_exclusive(self):
