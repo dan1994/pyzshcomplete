@@ -7,7 +7,7 @@ import sys
 sys.path.append('../pyzshcomplete')
 from pyzshcomplete import autocomplete
 
-os.environ['ARGCOMPLETE'] = '1'
+os.environ['PYZSHCOMPLETE'] = '1'
 
 
 @fixture(scope='function')
