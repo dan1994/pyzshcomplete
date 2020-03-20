@@ -5,6 +5,6 @@ function _python_script() {
     _compskip=all
 
     local script=${words[1]}
-    local arguments=(${(f)"$(ARGCOMPLETE=1 ${script} 2> /dev/null)"})
+    local arguments=(${(f)"$(PYZSHCOMPLETE=1 ${script} 2> /dev/null)"})
     _arguments -s -w : ${arguments[@]}
 }
