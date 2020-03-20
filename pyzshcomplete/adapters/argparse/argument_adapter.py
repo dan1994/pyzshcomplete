@@ -17,6 +17,8 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def name(self):
+        if self._argument.metavar is not None:
+            return self._argument.metavar
         return self._argument.dest
 
     @property
