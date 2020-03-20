@@ -49,7 +49,11 @@ class ArgumentAdapter(metaclass=ABCMeta):
 
 class StringifyableArgumentAdapter(ArgumentAdapter):
 
-    SUBARGUMENT_LOCATION = '+'
+    SUBARGUMENT_SPACE_SEPERATOR = ''
+    SUBARGUMENT_NO_SEPARATOR = '-'
+    SUBARGUMENT_EITHER_NO_OR_SPACE_SEPARATOR = '+'
+    SUBARGUMENT_EITHER_EQUAL_SIGN_OR_SPACE_SEPERATOR = '='
+    SUBARGUMENT_EITHER_EQUAL_SIGN_SEPERATOR = '=-'
 
     def __str__(self):
         if self.is_optional:
@@ -57,11 +61,11 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
         return self._positional_argument_to_string()
 
     def _optional_argument_to_string(self):
-        return '{exclusion_list}{options}{subargument_location}{help}' \
+        return '{exclusion_list}{options}{subargument_separator}{help}' \
             '{subarguments}'.format(
                 exclusion_list=self._exclusion_list_to_string(),
                 options=self._options_to_string(),
-                subargument_location=self._subargument_location_to_string(),
+                subargument_separator=self._subargument_separator_to_string(),
                 help=self._help_to_string(),
                 subarguments=self._subarguments_to_string()
             )
@@ -87,9 +91,9 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
     def _options_to_string(self):
         return '{{{}}}'.format(','.join(self.options))
 
-    def _subargument_location_to_string(self):
+    def _subargument_separator_to_string(self):
         if self.subargument_count == 1:
-            return StringifyableArgumentAdapter.SUBARGUMENT_LOCATION
+            return StringifyableArgumentAdapter.SUBARGUMENT_EITHER_NO_OR_SPACE_SEPARATOR
         return ''
 
     def _help_to_string(self):
