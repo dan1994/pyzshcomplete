@@ -55,6 +55,11 @@ class ArgumentAdapterInterface(metaclass=ABCMeta):
     def can_repeat(self):
         return
 
+    @property
+    @abstractmethod
+    def is_rest_of_arguments(self):
+        return
+
 
 class ArgumentAdapter(ArgumentAdapterInterface):
 
@@ -81,15 +86,21 @@ class ArgumentAdapter(ArgumentAdapterInterface):
             )
 
     def _positional_argument_to_string(self):
-        if self.subargument_count != 1:
-            raise NotImplementedError(
-                'A positional argument can currently be completed only once')
+        message = self._name_and_help_to_string()
+        completions = self._completions_to_string()
 
-        return ':{is_optional}{message}:{completions}'.format(
-            is_optional=self._is_optional_to_string(),
-            message=self._name_and_help_to_string(),
-            completions=self._completions_to_string()
-        )
+        if self.is_rest_of_arguments:
+            return '*:{message}:{action}'.format(
+                message=message,
+                action=completions
+            )
+
+        return self.subargument_count * \
+            ':{is_optional}{message}:{action}'.format(
+                is_optional=self._is_optional_to_string(),
+                message=message,
+                action=completions
+            )
 
     def _exclusion_list_to_string(self):
         if self.is_exclusive:
@@ -124,9 +135,15 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return self.name
 
     def _subarguments_to_string(self):
-        return ': :{}'.format(self._completions_to_string()) * \
-            self.subargument_count
+        return self.subargument_count * \
+            '{}: :{}'.format(
+                self._has_variable_subarguments_to_string(),
+                self._completions_to_string()
+            )
 
     def _completions_to_string(self):
         # TODO - Implement more complicated completers such as choice completer
         return '_files'
+
+    def _has_variable_subarguments_to_string(self):
+        return '*' if self.is_rest_of_arguments else ''
