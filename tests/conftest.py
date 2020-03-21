@@ -1,25 +1,10 @@
-from pytest import fixture, raises
-from argparse import ArgumentParser
-from io import StringIO
-import os
-import sys
-
 from pyzshcomplete import autocomplete
+from pytest import fixture, raises
 
+import os
 
-sys.path.append('../pyzshcomplete')
 
 os.environ['PYZSHCOMPLETE'] = '1'
-
-
-@fixture(scope='function')
-def default_parser():
-    return ArgumentParser()
-
-
-@fixture(scope='function')
-def empty_parser():
-    return ArgumentParser(add_help=False)
 
 
 @fixture(scope='function')
