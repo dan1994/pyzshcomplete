@@ -107,12 +107,13 @@ class ArgumentAdapter(ArgumentAdapterInterface):
                 action=completions
             )
 
-        return self.subargument_count * \
+        return '\n'.join([
             ':{is_optional}{message}:{action}'.format(
                 is_optional=self._is_optional_to_string(),
                 message=message,
                 action=completions
             )
+            for _ in range(self.subargument_count)])
 
     def _exclusion_list_to_string(self):
         if self.is_exclusive:
