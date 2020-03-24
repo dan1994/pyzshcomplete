@@ -1,5 +1,5 @@
 from argparse import _HelpAction, _VersionAction, _AppendAction, \
-    _AppendConstAction, REMAINDER, SUPPRESS
+    _AppendConstAction, _CountAction, REMAINDER, SUPPRESS
 # _ExtendAction was added in python3.8
 try:
     from argparse import _ExtendAction
@@ -63,8 +63,8 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def can_repeat(self):
-        return isinstance(self._argument,
-                          (_AppendAction, _AppendConstAction, _ExtendAction))
+        return isinstance(self._argument, (_AppendAction, _AppendConstAction,
+                                           _ExtendAction, _CountAction))
 
     @property
     def is_rest_of_arguments(self):
