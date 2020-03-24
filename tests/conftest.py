@@ -14,6 +14,6 @@ def autocomplete_and_compare(capsys):
             autocomplete(parser)
         output = capsys.readouterr().out
         options = output.split('\n')[:-1]
-        assert sorted(options) == sorted(expected)
+        assert options == expected
 
     return _autocomplete_and_compare
