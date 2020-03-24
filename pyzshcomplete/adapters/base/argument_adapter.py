@@ -153,7 +153,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
 
     def _help_to_string(self):
         if self.help is not None and len(self.help) > 0:
-            return '[{}]'.format(self.help)
+            return '[{}]'.format(self._escaped_help())
         return ''
 
     def _is_optional_to_string(self):
@@ -161,8 +161,11 @@ class ArgumentAdapter(ArgumentAdapterInterface):
 
     def _name_and_help_to_string(self):
         if self.help is not None and len(self.help) > 0:
-            return '{} - {}'.format(self.name, self.help)
+            return '{} - {}'.format(self.name, self._escaped_help())
         return self.name
+
+    def _escaped_help(self):
+        return self.help.replace(r':', r'\:')
 
     def _subarguments_to_string(self):
         return self.subargument_count * \
@@ -184,7 +187,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         completion_choices = self._choices_to_dict()
         completion_choices_as_string = ' '.join([
             ArgumentAdapter._choice_to_string(choice, description)
-            for choice, description in completion_choices])
+            for choice, description in completion_choices.items()])
         return '({})'.format(completion_choices_as_string)
 
     def _choices_to_dict(self):
