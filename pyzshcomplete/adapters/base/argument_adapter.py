@@ -165,7 +165,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return self.name
 
     def _escaped_help(self):
-        return self.help.replace(r':', r'\:')
+        return self.help.replace(r':', r'\:').replace('\n', ' ')
 
     def _subarguments_to_string(self):
         return self.subargument_count * \
