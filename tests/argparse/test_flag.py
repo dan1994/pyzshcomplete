@@ -1,6 +1,6 @@
 from pytest import mark, skip
 from sys import version_info
-from argparse import REMAINDER
+from argparse import OPTIONAL, ZERO_OR_MORE, ONE_OR_MORE, REMAINDER
 
 
 def test_short_option(empty_parser, autocomplete_and_compare):
@@ -87,7 +87,7 @@ def test_one_subargument(empty_parser, autocomplete_and_compare, nargs):
 
 
 def test_optional_subargument(empty_parser, autocomplete_and_compare):
-    empty_parser.add_argument('-a', nargs='?')
+    empty_parser.add_argument('-a', nargs=OPTIONAL)
     autocomplete_and_compare(empty_parser, [r'(-a){-a}+:: :_files'])
 
 
@@ -98,7 +98,7 @@ def test_multiple_subarguments(empty_parser, autocomplete_and_compare, nargs):
         empty_parser, [r'(-a){{-a}}{}'.format(nargs * r':: :_files')])
 
 
-@mark.parametrize('nargs', ['*', '+', REMAINDER])
+@mark.parametrize('nargs', [ZERO_OR_MORE, ONE_OR_MORE, REMAINDER])
 def test_variable_subarguments(empty_parser, autocomplete_and_compare, nargs):
     empty_parser.add_argument('-a', nargs=nargs)
     autocomplete_and_compare(empty_parser, [r'(-a){-a}+:*: :_files'])

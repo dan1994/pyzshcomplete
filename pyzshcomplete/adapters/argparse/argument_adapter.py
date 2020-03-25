@@ -1,5 +1,6 @@
 from argparse import _HelpAction, _VersionAction, _AppendAction, \
-    _AppendConstAction, _CountAction, REMAINDER, SUPPRESS
+    _AppendConstAction, _CountAction, OPTIONAL, ZERO_OR_MORE, ONE_OR_MORE, \
+    REMAINDER, SUPPRESS
 # _ExtendAction was added in python3.8
 try:
     from argparse import _ExtendAction
@@ -33,12 +34,12 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
         if self._argument.nargs is None:
             return 1
         # The 'optionality' of the argument is checked using is_optional
-        if self._argument.nargs == '?':
+        if self._argument.nargs == OPTIONAL:
             return 1
         # These cases are non-trivial: This function should always return an
         # int, and the cases that denote an unlimited number of arguments are
         # handled by checking is_rest_of_arguments.
-        if self._argument.nargs in ['*', '+', REMAINDER]:
+        if self._argument.nargs in [ZERO_OR_MORE, ONE_OR_MORE, REMAINDER]:
             return 1
         return self._argument.nargs
 
@@ -53,8 +54,8 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     @property
     def is_optional(self):
         if self.is_positional:
-            # The '*' case is handled by is_rest_of_arguments
-            return self._argument.nargs == '?'
+            # The ZERO_OR_MORE case is handled by is_rest_of_arguments
+            return self._argument.nargs == OPTIONAL
         return not self._argument.required
 
     @property
@@ -68,7 +69,7 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def is_rest_of_arguments(self):
-        return self._argument.nargs in ['*', '+', REMAINDER]
+        return self._argument.nargs in [ZERO_OR_MORE, ONE_OR_MORE, REMAINDER]
 
     @property
     def complete_with(self):
