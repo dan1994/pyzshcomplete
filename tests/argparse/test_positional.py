@@ -9,7 +9,7 @@ def test_actions_with_argument(empty_parser, autocomplete_and_compare, action):
         skip('The extend action is supported from python >= 3.8')
 
     empty_parser.add_argument('arg', action=action)
-    autocomplete_and_compare(empty_parser, [r':arg:_default'])
+    autocomplete_and_compare(empty_parser, [r':arg:_files'])
 
 
 @mark.parametrize('action', ['store_const', 'append_const'])
@@ -31,24 +31,31 @@ def test_actions_without_argument_requiring_no_const(empty_parser,
 @mark.parametrize('nargs', [None, 1])
 def test_one_subargument(empty_parser, autocomplete_and_compare, nargs):
     empty_parser.add_argument('arg', nargs=nargs)
-    autocomplete_and_compare(empty_parser, [r':arg:_default'])
+    autocomplete_and_compare(empty_parser, [r':arg:_files'])
 
 
 def test_optional_subargument(empty_parser, autocomplete_and_compare):
     empty_parser.add_argument('arg', nargs='?')
-    autocomplete_and_compare(empty_parser, [r'::arg:_default'])
+    autocomplete_and_compare(empty_parser, [r'::arg:_files'])
 
 
 @mark.parametrize('nargs', [2, 10])
 def test_multiple_subarguments(empty_parser, autocomplete_and_compare, nargs):
     empty_parser.add_argument('arg', nargs=nargs)
-    autocomplete_and_compare(empty_parser, nargs * [r':arg:_default'])
+    autocomplete_and_compare(empty_parser, nargs * [r':arg:_files'])
 
 
 @mark.parametrize('nargs', ['*', '+', REMAINDER])
 def test_variable_subarguments(empty_parser, autocomplete_and_compare, nargs):
     empty_parser.add_argument('arg', nargs=nargs)
-    autocomplete_and_compare(empty_parser, [r'*:arg:_default'])
+    autocomplete_and_compare(empty_parser, [r'*:arg:_files'])
+
+
+@mark.parametrize('arg_type', [int, float, complex])
+def test_types_to_not_complete(empty_parser, autocomplete_and_compare,
+                               arg_type):
+    empty_parser.add_argument('arg', type=arg_type)
+    autocomplete_and_compare(empty_parser, [r':arg: '])
 
 
 @mark.parametrize('choices', [[], ['choice1'], ['choice1', 'choise2'],
@@ -65,7 +72,7 @@ def test_choices(empty_parser, autocomplete_and_compare, choices):
 
 def test_empty_help(empty_parser, autocomplete_and_compare):
     empty_parser.add_argument('arg', help='')
-    autocomplete_and_compare(empty_parser, [r':arg:_default'])
+    autocomplete_and_compare(empty_parser, [r':arg:_files'])
 
 
 @mark.parametrize('help', ['Help about argument', 'help: argument description',
@@ -75,9 +82,9 @@ def test_help(empty_parser, autocomplete_and_compare, help):
 
     empty_parser.add_argument('arg', help=help)
     autocomplete_and_compare(
-        empty_parser, [r':arg - {}:_default'.format(help_as_str)])
+        empty_parser, [r':arg - {}:_files'.format(help_as_str)])
 
 
 def test_metavar(empty_parser, autocomplete_and_compare):
     empty_parser.add_argument('arg', metavar='name')
-    autocomplete_and_compare(empty_parser, [r':name:_default'])
+    autocomplete_and_compare(empty_parser, [r':name:_files'])
