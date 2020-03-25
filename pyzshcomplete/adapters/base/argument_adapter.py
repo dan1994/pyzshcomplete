@@ -181,6 +181,8 @@ class ArgumentAdapter(ArgumentAdapterInterface):
     def _completions_to_string(self):
         if self.complete_with == ArgumentAdapter.COMPLETE_WITH_CHOICES:
             return self._choices_to_string()
+        if self.complete_with == ZshConstants.DONT_COMPLETE:
+            return ZshConstants.DONT_COMPLETE
         return self._zsh_tags_to_string()
 
     def _choices_to_string(self):
@@ -225,6 +227,8 @@ class ZshConstants:
     OPTIONAL_ARGUMENT = ':'
     REPEATING_ARGUMENT = '*'
     VARIABLE_SUBARGUMENTS = '*'
+
+    DONT_COMPLETE = ' '
 
     class Exclusion:
         REST_OF_ARGUMENTS = '*'
