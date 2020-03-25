@@ -66,10 +66,8 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def is_optional(self):
-        if self.is_positional:
-            # The ZERO_OR_MORE case is handled by is_rest_of_arguments
-            return self._argument.nargs == OPTIONAL
-        return not self._argument.required
+        # The ZERO_OR_MORE case is handled by is_rest_of_arguments
+        return self._argument.nargs == OPTIONAL
 
     @property
     def is_exclusive(self):
