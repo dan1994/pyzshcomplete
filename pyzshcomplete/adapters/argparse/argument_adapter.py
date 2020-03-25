@@ -45,11 +45,24 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def help(self):
-        if self._argument.help == SUPPRESS:
+        if self._argument.help in (None, SUPPRESS):
             return ''
-        # TODO - argparse help can have placeholders that it automatically
-        # replaces when displaying the help. We should do the same
-        return self._argument.help
+
+        return self._argument.help % self._help_format_dict()
+
+    def _help_format_dict(self):
+        argument_members_dict = dict()
+        for member in ['nargs', 'const', 'default', 'type', 'choices', 'required', 'metavar', 'dest', 'help']:
+            argument_members_dict[member] = eval(
+                'self._argument.{}'.format(member))
+
+        parser_members_dict = {
+            'prog': self._parser.prog
+        }
+
+        format_dict = {**parser_members_dict, **argument_members_dict}
+
+        return format_dict
 
     @property
     def is_optional(self):
