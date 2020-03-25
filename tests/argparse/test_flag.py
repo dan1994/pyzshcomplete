@@ -65,3 +65,15 @@ def test_repeating_actions_without_argument_requiring_no_const(empty_parser,
                                                                action):
     empty_parser.add_argument('-a', action=action)
     autocomplete_and_compare(empty_parser, [r'*{-a}'])
+
+
+def test_help_action(empty_parser, autocomplete_and_compare):
+    empty_parser.add_argument('-a', action='help')
+    autocomplete_and_compare(empty_parser, [r'(* : -){-a}'])
+
+
+def test_version_action(empty_parser, autocomplete_and_compare):
+    empty_parser.add_argument('-a', action='version')
+    # The version action sets the help message if it's None
+    autocomplete_and_compare(
+        empty_parser, [r"(* : -){-a}[show program's version number and exit]"])
