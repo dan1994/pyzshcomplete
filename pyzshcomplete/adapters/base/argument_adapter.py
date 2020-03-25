@@ -156,9 +156,6 @@ class ArgumentAdapter(ArgumentAdapterInterface):
             return '[{}]'.format(self._escaped_help())
         return ''
 
-    def _is_optional_to_string(self):
-        return ZshConstants.OPTIONAL_ARGUMENT if self.is_optional else ''
-
     def _name_and_help_to_string(self):
         if self.help is not None and len(self.help) > 0:
             return '{} - {}'.format(self.name, self._escaped_help())
@@ -168,15 +165,18 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return self.help.replace(r':', r'\:').replace('\n', ' ')
 
     def _subarguments_to_string(self):
+        completions = self._completions_to_string()
+        if self.is_rest_of_arguments:
+            return ':*: :{}'.format(completions)
+
         return self.subargument_count * \
-            '{}: :{}'.format(
-                self._has_variable_subarguments_to_string(),
-                self._completions_to_string()
+            ':{is_optional} :{completions}'.format(
+                is_optional=self._is_optional_to_string(),
+                completions=completions
             )
 
-    def _has_variable_subarguments_to_string(self):
-        return ZshConstants.VARIABLE_SUBARGUMENTS if self.is_rest_of_arguments \
-            else ''
+    def _is_optional_to_string(self):
+        return ZshConstants.OPTIONAL_ARGUMENT if self.is_optional else ''
 
     def _completions_to_string(self):
         if self.complete_with == ArgumentAdapter.COMPLETE_WITH_CHOICES:

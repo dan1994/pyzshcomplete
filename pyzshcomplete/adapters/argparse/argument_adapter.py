@@ -68,8 +68,7 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def is_rest_of_arguments(self):
-        return self.is_positional and self._argument.nargs in \
-            ['*', '+', REMAINDER]
+        return self._argument.nargs in ['*', '+', REMAINDER]
 
     @property
     def complete_with(self):
