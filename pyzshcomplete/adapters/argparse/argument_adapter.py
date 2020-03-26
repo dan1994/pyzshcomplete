@@ -6,8 +6,7 @@ try:
 except ImportError:
     _ExtendAction = _AppendAction
 
-from pyzshcomplete.adapters.base.argument_adapter import ArgumentAdapter, \
-    ZshConstants
+from pyzshcomplete.adapters.base.argument_adapter import ArgumentAdapter
 
 
 class ArgparseArgumentAdapter(ArgumentAdapter):
@@ -70,14 +69,3 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     def is_rest_of_arguments(self):
         return self.is_positional and self._argument.nargs in \
             ['*', '+', REMAINDER]
-
-    @property
-    def complete_with(self):
-        if self._argument.choices is not None:
-            return ArgumentAdapter.COMPLETE_WITH_CHOICES
-        # TODO - Check type for smarter completion
-        return ZshConstants.Tags.DEFAULT
-
-    @property
-    def completion_choices(self):
-        return self._argument.choices
