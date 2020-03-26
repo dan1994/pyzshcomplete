@@ -152,7 +152,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return ZshConstants.SubargumentSeparator.SPACE
 
     def _help_to_string(self):
-        if self.help is not None and len(self.help) > 0:
+        if len(self.help) > 0:
             return '[{}]'.format(self.help)
         return ''
 
@@ -160,7 +160,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return ZshConstants.OPTIONAL_ARGUMENT if self.is_optional else ''
 
     def _name_and_help_to_string(self):
-        if self.help is not None and len(self.help) > 0:
+        if len(self.help) > 0:
             return '{} - {}'.format(self.name, self.help)
         return self.name
 
