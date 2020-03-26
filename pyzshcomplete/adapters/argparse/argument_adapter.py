@@ -1,5 +1,5 @@
 from argparse import _HelpAction, _VersionAction, _AppendAction, \
-    _AppendConstAction, REMAINDER, SUPPRESS
+    _AppendConstAction
 # _ExtendAction was added in python3.8
 try:
     from argparse import _ExtendAction
@@ -31,14 +31,6 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     def subargument_count(self):
         if self._argument.nargs is None:
             return 1
-        # The 'optionality' of the argument is checked using is_optional
-        if self._argument.nargs == '?':
-            return 1
-        # These cases are non-trivial: This function should always return an
-        # int, and the cases that denote an unlimited number of arguments are
-        # handled by checking is_rest_of_arguments.
-        if self._argument.nargs in ['*', '+', REMAINDER]:
-            return 1
         return self._argument.nargs
 
     @property
@@ -52,8 +44,7 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     @property
     def is_optional(self):
         if self.is_positional:
-            # The '*' case is handled by is_rest_of_arguments
-            return self._argument.nargs == '?'
+            return self._argument.nargs in ['?', '*']
         return not self._argument.required
 
     @property
@@ -64,8 +55,3 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     def can_repeat(self):
         return isinstance(self._argument,
                           (_AppendAction, _AppendConstAction, _ExtendAction))
-
-    @property
-    def is_rest_of_arguments(self):
-        return self.is_positional and self._argument.nargs in \
-            ['*', '+', REMAINDER]
