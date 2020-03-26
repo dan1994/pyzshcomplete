@@ -74,9 +74,8 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     def complete_with(self):
         if self._argument.choices is not None:
             return ArgumentAdapter.COMPLETE_WITH_CHOICES
-        if self._argument.type in (int, float, complex, bool):
-            return ZshConstants.DONT_COMPLETE
-        return ZshConstants.Tags.FILES
+        # TODO - Check type for smarter completion
+        return ZshConstants.Tags.DEFAULT
 
     @property
     def completion_choices(self):
