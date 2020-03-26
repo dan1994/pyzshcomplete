@@ -9,11 +9,11 @@ class ArgumentAdapterInterface(metaclass=ABCMeta):
 
     @property
     def is_positional(self):
-        return not self.is_flag
+        return not self.is_optional
 
     @property
     @abstractmethod
-    def is_flag(self):
+    def is_optional(self):
         return
 
     @property
@@ -23,7 +23,7 @@ class ArgumentAdapterInterface(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def flags(self):
+    def options(self):
         return
 
     @property
@@ -56,16 +56,15 @@ class ArgumentAdapter(ArgumentAdapterInterface):
     SUBARGUMENT_EITHER_EQUAL_SIGN_SEPERATOR = '=-'
 
     def __str__(self):
-        if self.is_flag:
-            return self._flag_argument_to_string()
+        if self.is_optional:
+            return self._optional_argument_to_string()
         return self._positional_argument_to_string()
 
-    def _flag_argument_to_string(self):
-        return '{exclusion_list}{can_repeat}{flags}{subargument_separator}'\
-            '{help}{subarguments}'.format(
+    def _optional_argument_to_string(self):
+        return '{exclusion_list}{options}{subargument_separator}{help}' \
+            '{subarguments}'.format(
                 exclusion_list=self._exclusion_list_to_string(),
-                can_repeat=self._can_repeat_to_string(),
-                flags=self._flags_to_string(),
+                options=self._options_to_string(),
                 subargument_separator=self._subargument_separator_to_string(),
                 help=self._help_to_string(),
                 subarguments=self._subarguments_to_string()
@@ -87,13 +86,10 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         # TODO - Missing exclusion of exclusive options for below cases
         if self.can_repeat:
             return ''
-        return '({})'.format(' '.join(self.flags))
+        return '({})'.format(' '.join(self.options))
 
-    def _can_repeat_to_string(self):
-        return '*' if self.can_repeat else ''
-
-    def _flags_to_string(self):
-        return '{{{}}}'.format(','.join(self.flags))
+    def _options_to_string(self):
+        return '{{{}}}'.format(','.join(self.options))
 
     def _subargument_separator_to_string(self):
         if self.subargument_count == 1:

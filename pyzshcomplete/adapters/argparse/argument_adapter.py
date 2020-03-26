@@ -11,7 +11,7 @@ from pyzshcomplete.adapters.base.argument_adapter import ArgumentAdapter
 class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
-    def is_flag(self):
+    def is_optional(self):
         return len(self._argument.option_strings) > 0
 
     @property
@@ -19,9 +19,9 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
         return self._argument.dest
 
     @property
-    def flags(self):
+    def options(self):
         if self.is_positional:
-            raise TypeError('A positional argument doesn\'t have flags')
+            raise TypeError('A positional argument doesn\'t have options')
         return self._argument.option_strings
 
     @property
