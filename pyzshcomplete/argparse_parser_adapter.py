@@ -1,6 +1,5 @@
-from pyzshcomplete.adapters.base.parser_adapter import ParserAdapter
-from pyzshcomplete.adapters.argparse.argument_adapter import \
-    ArgparseArgumentAdapter
+from pyzshcomplete.parser_adapter import ParserAdapter
+from pyzshcomplete.argparse_argument_adapter import ArgparseArgumentAdapter
 
 
 class ArgparseParserAdapter(ParserAdapter):

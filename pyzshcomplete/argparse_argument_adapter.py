@@ -1,12 +1,10 @@
-from argparse import _HelpAction, _VersionAction, _AppendAction, \
-    _AppendConstAction
+from argparse import _HelpAction, _VersionAction, _AppendAction, _AppendConstAction
 try:
     from argparse import _ExtendAction
 except ImportError:
     _ExtendAction = _AppendAction
 
-from pyzshcomplete.adapters.base.argument_adapter import \
-    StringifyableArgumentAdapter
+from pyzshcomplete.argument_adapter import StringifyableArgumentAdapter
 
 
 class ArgparseArgumentAdapter(StringifyableArgumentAdapter):
