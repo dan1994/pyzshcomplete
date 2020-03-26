@@ -35,10 +35,6 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def help(self):
-        if self._argument.help == SUPPRESS:
-            return ''
-        # TODO - argparse help can have placeholders that it automatically
-        # replaces when displaying the help. We should do the same
         return self._argument.help
 
     @property
