@@ -3,38 +3,24 @@ from sys import version_info
 from argparse import REMAINDER
 
 
-@mark.parametrize('action', ['store', 'append', 'extend'])
-def test_actions_with_argument(empty_parser, autocomplete_and_compare, action):
+@mark.parametrize('action', ['store', 'store_const', 'store_true',
+                             'store_false', 'append', 'append_const', 'count',
+                             'help', 'version', 'extend'])
+def test_actions(empty_parser, autocomplete_and_compare, action):
     if action == 'extend' and version_info.minor < 8:
-        skip('The extend action is supported from python >= 3.8')
+        skip('3.8')
 
-    empty_parser.add_argument('pos', action=action)
-    autocomplete_and_compare(empty_parser, [r':pos:_default'])
-
-
-@mark.parametrize('action', ['store_const', 'append_const'])
-def test_actions_without_argument_requiring_const(empty_parser,
-                                                  autocomplete_and_compare,
-                                                  action):
-    if action == 'extend' and version_info.minor < 8:
-        skip('The extend action is supported from python >= 3.8')
-
-    empty_parser.add_argument('pos', action=action, const=1)
-    autocomplete_and_compare(empty_parser, [r''])
-
-
-@mark.parametrize('action', ['store_true', 'store_false', 'count'])
-def test_actions_without_argument_requiring_no_const(empty_parser,
-                                                     autocomplete_and_compare,
-                                                     action):
-    empty_parser.add_argument('pos', action=action)
-    autocomplete_and_compare(empty_parser, [r''])
+    empty_parser.add_argument('pos', help='A positional argument')
+    autocomplete_and_compare(
+        empty_parser, [r':pos - A positional argument:_default'])
 
 
 @mark.parametrize('nargs', [None, 1])
 def test_one_subargument(empty_parser, autocomplete_and_compare, nargs):
     empty_parser.add_argument('arg', nargs=nargs)
-    autocomplete_and_compare(empty_parser, [r':arg:_default'])
+    autocomplete_and_compare(empty_parser, [
+        r':arg:_default'
+    ])
 
 
 def test_optional_subargument(empty_parser, autocomplete_and_compare):
