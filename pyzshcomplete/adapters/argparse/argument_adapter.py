@@ -5,10 +5,11 @@ try:
 except ImportError:
     _ExtendAction = _AppendAction
 
-from pyzshcomplete.adapters.base.argument_adapter import ArgumentAdapter
+from pyzshcomplete.adapters.base.argument_adapter import \
+    StringifyableArgumentAdapter
 
 
-class ArgparseArgumentAdapter(ArgumentAdapter):
+class ArgparseArgumentAdapter(StringifyableArgumentAdapter):
 
     @property
     def is_optional(self):

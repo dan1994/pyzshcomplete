@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class ArgumentAdapterInterface(metaclass=ABCMeta):
+class ArgumentAdapter(metaclass=ABCMeta):
 
     def __init__(self, parser, argument):
         self._parser = parser
@@ -47,7 +47,7 @@ class ArgumentAdapterInterface(metaclass=ABCMeta):
         return
 
 
-class ArgumentAdapter(ArgumentAdapterInterface):
+class StringifyableArgumentAdapter(ArgumentAdapter):
 
     SUBARGUMENT_SPACE_SEPERATOR = ''
     SUBARGUMENT_NO_SEPARATOR = '-'
@@ -93,8 +93,8 @@ class ArgumentAdapter(ArgumentAdapterInterface):
 
     def _subargument_separator_to_string(self):
         if self.subargument_count == 1:
-            return ArgumentAdapter.SUBARGUMENT_EITHER_NO_OR_SPACE_SEPARATOR
-        return ArgumentAdapter.SUBARGUMENT_SPACE_SEPERATOR
+            return StringifyableArgumentAdapter.SUBARGUMENT_EITHER_NO_OR_SPACE_SEPARATOR
+        return ''
 
     def _help_to_string(self):
         if len(self.help) > 0:
