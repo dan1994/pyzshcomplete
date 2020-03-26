@@ -163,15 +163,16 @@ class ArgumentAdapter(ArgumentAdapterInterface):
             return ''
 
     def _flag_argument_to_string(self):
-        return '{exclusion_list}{can_repeat}{flags}{subargument_separator}'\
+        return '\n'.join([
+            '{exclusion_list}{can_repeat}{flag}{subargument_separator}'
             '{help}{subarguments}'.format(
                 exclusion_list=self._exclusion_list_to_string(),
                 can_repeat=self._can_repeat_to_string(),
-                flags=self._flags_to_string(),
+                flag=flag,
                 subargument_separator=self._subargument_separator_to_string(),
                 help=self._help_to_string(),
                 subarguments=self._subarguments_to_string()
-            )
+            ) for flag in list(self.flags)])
 
     def _positional_argument_to_string(self):
         message = self._name_and_help_to_string()
@@ -206,10 +207,6 @@ class ArgumentAdapter(ArgumentAdapterInterface):
 
     def _can_repeat_to_string(self):
         return ZshConstants.REPEATING_ARGUMENT if self.can_repeat else ''
-
-    def _flags_to_string(self):
-        self._validate_flags_prefix()
-        return '{{{}}}'.format(','.join(self.flags))
 
     def _validate_flags_prefix(self):
         prefixes = map(lambda flag: flag[0], self.flags)

@@ -8,5 +8,5 @@ def test_parents(autocomplete_and_compare):
     child.add_argument('-a')
     autocomplete_and_compare(child, [
         r':arg:_files',
-        r'(-a){-a}+: :_files'
+        r'(-a)-a+: :_files'
     ])
