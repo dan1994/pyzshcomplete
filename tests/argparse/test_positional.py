@@ -1,6 +1,6 @@
 from pytest import mark, skip
 from sys import version_info
-from argparse import OPTIONAL, ZERO_OR_MORE, ONE_OR_MORE, REMAINDER
+from argparse import REMAINDER
 
 
 @mark.parametrize('action', ['store', 'append', 'extend'])
@@ -35,7 +35,7 @@ def test_one_subargument(empty_parser, autocomplete_and_compare, nargs):
 
 
 def test_optional_subargument(empty_parser, autocomplete_and_compare):
-    empty_parser.add_argument('arg', nargs=OPTIONAL)
+    empty_parser.add_argument('arg', nargs='?')
     autocomplete_and_compare(empty_parser, [r'::arg:_files'])
 
 
@@ -45,7 +45,7 @@ def test_multiple_subarguments(empty_parser, autocomplete_and_compare, nargs):
     autocomplete_and_compare(empty_parser, nargs * [r':arg:_files'])
 
 
-@mark.parametrize('nargs', [ZERO_OR_MORE, ONE_OR_MORE, REMAINDER])
+@mark.parametrize('nargs', ['*', '+', REMAINDER])
 def test_variable_subarguments(empty_parser, autocomplete_and_compare, nargs):
     empty_parser.add_argument('arg', nargs=nargs)
     autocomplete_and_compare(empty_parser, [r'*:arg:_files'])
