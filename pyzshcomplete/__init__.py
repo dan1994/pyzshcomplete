@@ -1,23 +1,18 @@
 from os import environ
-from sys import exit
 
-from pyzshcomplete.adapters.argparse.parser_adapter import ArgparseParserAdapter
+from pyzshcomplete.zsh_completer import ZshCompleter
 
 
 __all__ = ['autocomplete']
 
 
 def autocomplete(parser):
-    if not _running_in_autocompletion_context():
-        return
+	if not _running_in_autocompletion_context():
+		return
 
-    parser = ArgparseParserAdapter(parser)
-    arguments_as_string = str(parser)
-    print(arguments_as_string)
-
-    found_arguments = 0 if len(arguments_as_string) > 0 else -1
-    exit(found_arguments)
+	completer = ZshCompleter(parser)
+	completer.complete()
 
 
 def _running_in_autocompletion_context():
-    return 'ARGCOMPLETE' in environ
+	return 'ARGCOMPLETE' in environ
