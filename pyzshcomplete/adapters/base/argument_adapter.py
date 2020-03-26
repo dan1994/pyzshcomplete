@@ -37,15 +37,6 @@ class ArgumentAdapterInterface(metaclass=ABCMeta):
         return
 
     @property
-    def is_required(self):
-        return not self.is_optional
-
-    @property
-    @abstractmethod
-    def is_optional(self):
-        return
-
-    @property
     @abstractmethod
     def is_exclusive(self):
         return
@@ -85,8 +76,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
             raise NotImplementedError(
                 'A positional argument can currently be completed only once')
 
-        return ':{is_optional}{message}:{completions}'.format(
-            is_optional=self._is_optional_to_string(),
+        return ':{message}:{completions}'.format(
             message=self._name_and_help_to_string(),
             completions=self._completions_to_string()
         )
@@ -114,9 +104,6 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         if len(self.help) > 0:
             return '[{}]'.format(self.help)
         return ''
-
-    def _is_optional_to_string(self):
-        return ':' if self.is_optional else ''
 
     def _name_and_help_to_string(self):
         if len(self.help) > 0:
