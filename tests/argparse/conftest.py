@@ -4,9 +4,9 @@ from argparse import ArgumentParser
 
 @fixture(scope='function')
 def default_parser():
-    return ArgumentParser(prog='program')
+    return ArgumentParser()
 
 
 @fixture(scope='function')
 def empty_parser():
-    return ArgumentParser(prog='program', add_help=False)
+    return ArgumentParser(add_help=False)

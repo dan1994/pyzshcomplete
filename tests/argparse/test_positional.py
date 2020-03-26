@@ -85,20 +85,6 @@ def test_help(empty_parser, autocomplete_and_compare, help):
         empty_parser, [r':arg - {}:_files'.format(help_as_str)])
 
 
-def test_formatted_help(empty_parser, autocomplete_and_compare):
-    empty_parser.add_argument('arg', nargs=1, const=None, default='default',
-                              type=str, choices=['choice1', 'choice2'],
-                              metavar='metavar',
-                              help='%(nargs)s %(const)s %(default)s %(type)s '
-                              '%(choices)s %(required)s %(metavar)s %(dest)s '
-                              '%(help)s')
-    autocomplete_and_compare(empty_parser, [
-        r":metavar - 1 None default <class 'str'> ['choice1', 'choice2'] True "
-        r'metavar arg %(nargs)s %(const)s %(default)s %(type)s %(choices)s '
-        r'%(required)s %(metavar)s %(dest)s %(help)s:(choice1 choice2)'
-    ])
-
-
 def test_metavar(empty_parser, autocomplete_and_compare):
     empty_parser.add_argument('arg', metavar='name')
     autocomplete_and_compare(empty_parser, [r':name:_files'])
