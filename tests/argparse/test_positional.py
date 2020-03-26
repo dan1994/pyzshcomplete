@@ -8,15 +8,18 @@ def test_actions_with_argument(empty_parser, autocomplete_and_compare, action):
     if action == 'extend' and version_info.minor < 8:
         skip('The extend action is supported from python >= 3.8')
 
-    empty_parser.add_argument('arg', action=action)
-    autocomplete_and_compare(empty_parser, [r':arg:_default'])
+    empty_parser.add_argument('pos', action=action)
+    autocomplete_and_compare(empty_parser, [r':pos:_default'])
 
 
 @mark.parametrize('action', ['store_const', 'append_const'])
 def test_actions_without_argument_requiring_const(empty_parser,
                                                   autocomplete_and_compare,
                                                   action):
-    empty_parser.add_argument('arg', action=action, const=1)
+    if action == 'extend' and version_info.minor < 8:
+        skip('The extend action is supported from python >= 3.8')
+
+    empty_parser.add_argument('pos', action=action, const=1)
     autocomplete_and_compare(empty_parser, [r''])
 
 
@@ -24,7 +27,7 @@ def test_actions_without_argument_requiring_const(empty_parser,
 def test_actions_without_argument_requiring_no_const(empty_parser,
                                                      autocomplete_and_compare,
                                                      action):
-    empty_parser.add_argument('arg', action=action)
+    empty_parser.add_argument('pos', action=action)
     autocomplete_and_compare(empty_parser, [r''])
 
 
