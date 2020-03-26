@@ -1,6 +1,3 @@
-from argparse import OPTIONAL, ZERO_OR_MORE, REMAINDER
-
-
 def test_cat(empty_parser, autocomplete_and_compare):
     empty_parser.add_argument('-A', '--show-all', action='store_true',
                               help='equivalent to -vET')
@@ -26,7 +23,7 @@ def test_cat(empty_parser, autocomplete_and_compare):
                               help='display help and exit')
     empty_parser.add_argument('--version', action='version',
                               help='output version information and exit')
-    empty_parser.add_argument('files', nargs=ZERO_OR_MORE)
+    empty_parser.add_argument('files', nargs='*')
 
     autocomplete_and_compare(empty_parser, [
         r'(-A --show-all){-A,--show-all}[equivalent to -vET]',
@@ -79,7 +76,7 @@ def test_ps(empty_parser, autocomplete_and_compare):
                               'information about each light weight process')
     empty_parser.add_argument('-y', action='store_true',
                               help='show RSS in place of ADDR (used with -l)')
-    empty_parser.add_argument('--help', nargs=OPTIONAL,
+    empty_parser.add_argument('--help', nargs='?',
                               choices=['simple', 'list', 'output',
                                        'threads', 'misc', 'all'],
                               help='display help information')
@@ -109,76 +106,4 @@ def test_ps(empty_parser, autocomplete_and_compare):
         r'(--help){--help}+[display help information]:: :(simple list output threads misc all)',
         r'(* : -){--info}[display debugging information]',
         r'(* : -){-V,--version}[display version information]'
-    ])
-
-
-def test_ln(empty_parser, autocomplete_and_compare):
-    empty_parser.add_argument('-b', action='store_true',
-                              help='create a backup of each existing '
-                              'destination file')
-    empty_parser.add_argument('--backup', nargs=OPTIONAL,
-                              choices=['none', 'off', 'numbered', 't',
-                                       'existing', 'nil', 'simple', 'never'],
-                              help='create a backup of each existing '
-                              'destination file')
-    empty_parser.add_argument('-d', '-F', '--directory', action='store_true',
-                              help='allow the superuser to attempt to hard '
-                              'link directories')
-    empty_parser.add_argument('-f', '--force', action='store_true',
-                              help='remove existing destination files')
-    empty_parser.add_argument('-i', '--interactive', action='store_true',
-                              help='prompt before removing destination files')
-    empty_parser.add_argument('-L', '--logical', action='store_true',
-                              help='create hard links to symbolic link '
-                              'references')
-    empty_parser.add_argument('-n', '--no-dereference', action='store_true',
-                              help='treat destination symbolic link to a '
-                              'directory as if it were a normal file')
-    empty_parser.add_argument('-P', '--physical', action='store_true',
-                              help='create hard links directly to symbolic '
-                              'links')
-    empty_parser.add_argument('-r', '--relative', action='store_true',
-                              help='create symbolic links relative to link '
-                              'location')
-    empty_parser.add_argument('-s', '--symbolic', action='store_true',
-                              help='create symbolic links instead of hard '
-                              'links')
-    empty_parser.add_argument('-S', '--suffix',
-                              help='override default backup suffix')
-    empty_parser.add_argument('-t', '--target-directory',
-                              dest='target_directory',
-                              help='specify directory in which to create the '
-                              'links')
-    empty_parser.add_argument('-T', '--no-target-directory',
-                              action='store_const', const='',
-                              dest='target_directory',
-                              help='treat destination as a normal file')
-    empty_parser.add_argument('-v', '--verbose', action='store_true',
-                              help='print name of each linked file')
-    empty_parser.add_argument('--help', action='help',
-                              help='display usage information and exit')
-    empty_parser.add_argument('--version', action='version',
-                              help='display version information and exit')
-    empty_parser.add_argument('link_target')
-    empty_parser.add_argument(' ', nargs=REMAINDER)
-
-    autocomplete_and_compare(empty_parser, [
-        r'(-b){-b}[create a backup of each existing destination file]',
-        r'(--backup){--backup}+[create a backup of each existing destination file]:: :(none off numbered t existing nil simple never)',
-        r'(-d -F --directory){-d,-F,--directory}[allow the superuser to attempt to hard link directories]',
-        r'(-f --force){-f,--force}[remove existing destination files]',
-        r'(-i --interactive){-i,--interactive}[prompt before removing destination files]',
-        r'(-L --logical){-L,--logical}[create hard links to symbolic link references]',
-        r'(-n --no-dereference){-n,--no-dereference}[treat destination symbolic link to a directory as if it were a normal file]',
-        r'(-P --physical){-P,--physical}[create hard links directly to symbolic links]',
-        r'(-r --relative){-r,--relative}[create symbolic links relative to link location]',
-        r'(-s --symbolic){-s,--symbolic}[create symbolic links instead of hard links]',
-        r'(-S --suffix){-S,--suffix}+[override default backup suffix]: :_files',
-        r'(-t --target-directory){-t,--target-directory}+[specify directory in which to create the links]: :_files',
-        r'(-T --no-target-directory){-T,--no-target-directory}[treat destination as a normal file]',
-        r'(-v --verbose){-v,--verbose}[print name of each linked file]',
-        r'(* : -){--help}[display usage information and exit]',
-        r'(* : -){--version}[display version information and exit]',
-        r':link_target:_files',
-        r'*: :_files'
     ])
