@@ -25,7 +25,7 @@ def autocomplete(parser):
 
 
 def _running_in_autocompletion_context():
-    return 'PYZSHCOMPLETE' in environ
+    return 'ARGCOMPLETE' in environ
 
 
 def _parser_adapter(parser):
