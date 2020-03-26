@@ -57,12 +57,13 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
         return self._positional_argument_to_string()
 
     def _optional_argument_to_string(self):
-        return '{exclusion_list}{options}{subargument_location}{help}' \
-            '{subarguments}'.format(
+        return '{exclusion_list}{options}{subargument_location}{help}:' \
+            '{message}{subarguments}'.format(
                 exclusion_list=self._exclusion_list_to_string(),
                 options=self._options_to_string(),
                 subargument_location=self._subargument_location_to_string(),
                 help=self._help_to_string(),
+                message=self._name_and_help_to_string(),
                 subarguments=self._subarguments_to_string()
             )
 
@@ -99,12 +100,20 @@ class StringifyableArgumentAdapter(ArgumentAdapter):
 
     def _name_and_help_to_string(self):
         if len(self.help) > 0:
-            return '{} - {}'.format(self.name, self.help)
+            return '{}\\ -\\ {}'.format(
+                self.name,
+                self.help.replace(' ', r'\ ')
+            )
         return self.name
 
     def _subarguments_to_string(self):
-        return ': :{}'.format(self._completions_to_string()) * \
-            self.subargument_count
+        if self.subargument_count > 1:
+            raise NotImplementedError(
+                'An optional argument currently support up to one subargument')
+
+        if self.subargument_count == 1:
+            return ' arg:{}'.format(self._completions_to_string())
+        return ''
 
     def _completions_to_string(self):
         # TODO - Implement more complicated completers such as choice completer
