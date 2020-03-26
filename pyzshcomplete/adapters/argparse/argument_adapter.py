@@ -1,14 +1,15 @@
 from argparse import _HelpAction, _VersionAction, _AppendAction, \
     _AppendConstAction, _CountAction, OPTIONAL, ZERO_OR_MORE, ONE_OR_MORE, \
     REMAINDER, SUPPRESS
+
 # _ExtendAction was added in python3.8
 try:
     from argparse import _ExtendAction
 except ImportError:
     _ExtendAction = _AppendAction
 
-from pyzshcomplete.adapters.base.argument_adapter import ArgumentAdapter, \
-    ZshConstants
+from pyzshcomplete.adapters.base.argument_adapter import ArgumentAdapter
+from pyzshcomplete.utils.zsh_constants import ZshConstants
 
 
 class ArgparseArgumentAdapter(ArgumentAdapter):
