@@ -1,3 +1,14 @@
+'''
+This test suite aims at testing completion of known commands to see that the
+code handles complex argparse configurations. The spec is taken from zsh's own
+completion script, but may be partial or modified to be compatible with the way
+pyzshcomplete generates completion scripts. The modifications may be simple
+refactoring (e.g. whitespace changes), removing extra information that can't
+be supplied by argparse (e.g. flag subargument description) or handling features
+not supported by pyzshcomplete.
+'''
+
+
 from argparse import OPTIONAL, ZERO_OR_MORE, REMAINDER
 
 
