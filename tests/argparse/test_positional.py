@@ -80,10 +80,9 @@ def test_empty_help(empty_parser, autocomplete_and_compare):
     ])
 
 
-@mark.parametrize('help', ['Help about argument', 'help: argument description',
-                           'help with\nnewlines'])
+@mark.parametrize('help', ['Help about argument', 'help: argument description'])
 def test_help(empty_parser, autocomplete_and_compare, help):
-    help_as_str = help.replace(r':', r'\:').replace('\n', ' ')
+    help_as_str = help.replace(r':', r'\:')
 
     empty_parser.add_argument('arg', help=help)
     autocomplete_and_compare(empty_parser, [
