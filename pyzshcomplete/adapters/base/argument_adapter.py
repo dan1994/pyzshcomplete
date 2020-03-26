@@ -114,18 +114,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return '*' if self.can_repeat else ''
 
     def _flags_to_string(self):
-        self._validate_flags_prefix()
         return '{{{}}}'.format(','.join(self.flags))
-
-    def _validate_flags_prefix(self):
-        prefixes = map(lambda flag: flag[0], self.flags)
-        bad_prefixes = list(
-            filter(lambda prefix: prefix not in ['-', '+'], prefixes))
-
-        if len(bad_prefixes) > 0:
-            raise ValueError('Flag uses the {} prefix that is not supported by '
-                             'zsh. Only - and + are supported as flag prefixes'
-                             .format(bad_prefixes[0]))
 
     def _subargument_separator_to_string(self):
         if self.subargument_count == 1:
