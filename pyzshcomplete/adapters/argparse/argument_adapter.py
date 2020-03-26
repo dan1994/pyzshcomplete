@@ -39,7 +39,7 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
             return 1
         # These cases are non-trivial: This function should always return an
         # int, and the cases that denote an unlimited number of arguments are
-        # handled by checking is_rest_of_arguments.
+        # handled by checking has_variable_subarguments.
         if self._argument.nargs in [ZERO_OR_MORE, ONE_OR_MORE, REMAINDER]:
             return 1
         return self._argument.nargs
@@ -67,8 +67,10 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
 
     @property
     def is_optional(self):
-        # The ZERO_OR_MORE case is handled by is_rest_of_arguments
-        return self._argument.nargs == OPTIONAL
+        if self.is_positional:
+            # The ZERO_OR_MORE case is handled by has_variable_subarguments
+            return self._argument.nargs == OPTIONAL
+        return not self._argument.required
 
     @property
     def is_exclusive(self):
@@ -80,8 +82,12 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
                                            _ExtendAction, _CountAction))
 
     @property
-    def is_rest_of_arguments(self):
+    def has_variable_subarguments(self):
         return self._argument.nargs in [ZERO_OR_MORE, ONE_OR_MORE, REMAINDER]
+
+    @property
+    def is_subargument_optional(self):
+        return self._argument.nargs == OPTIONAL
 
     @property
     def complete_with(self):
