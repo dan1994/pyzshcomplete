@@ -1,8 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from sys import stderr
 
-from pyzshcomplete.utils.zsh_constants import ZshConstants
-
 
 class ArgumentAdapterInterface(metaclass=ABCMeta):
 
@@ -198,8 +196,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         if isinstance(self.completion_choices, dict):
             return self.completion_choices
         if isinstance(self.completion_choices, (list, tuple, set)):
-            return {completion: None for completion in
-                    list(self.completion_choices)}
+            return {completion: None for completion in self.completion_choices}
         return {self.completion_choices: None}
 
     @staticmethod
@@ -221,3 +218,111 @@ class ArgumentAdapter(ArgumentAdapterInterface):
 
         complete_with = map(lambda tag: '_{}'.format(tag), complete_with)
         return ' '.join(complete_with)
+
+
+class ZshConstants:
+
+    SUPPORTED_PREFIXES = ['+', '-']
+
+    OPTIONAL_ARGUMENT = ':'
+    REPEATING_ARGUMENT = '*'
+    VARIABLE_SUBARGUMENTS = '*'
+
+    DONT_COMPLETE = ' '
+
+    class Exclusion:
+        REST_OF_ARGUMENTS = '*'
+        POSITIONAL = ':'
+        FLAGS = '-'
+
+    class SubargumentSeparator:
+        NO_SEPARATOR = '-'
+        SPACE = ''
+        EQUAL_SIGN = '=-'
+        NONE_OR_SPACE = '+'
+        EQUAL_SIGN_OR_SPACE = '='
+
+    class Tags:
+        ACCOUNTS = 'accounts'
+        ALL_EXPANSIONS = 'all-expansions'
+        ALL_FILES = 'all-files'
+        ARGUMENTS = 'arguments'
+        ARRAYS = 'arrays'
+        ASSOCIATION_KEYS = 'association-keys'
+        BOOKMARKS = 'bookmarks'
+        BUILTINS = 'builtins'
+        CHARACTERS = 'characters'
+        COLORMAPIDS = 'colormapids'
+        COLORS = 'colors'
+        COMMANDS = 'commands'
+        CONTEXTS = 'contexts'
+        CORRECTIONS = 'corrections'
+        CURSORS = 'cursors'
+        DEFAULT = 'default'
+        DESCRIPTIONS = 'descriptions'
+        DEVICES = 'devices'
+        DIRECTORIES = 'directories'
+        DIRECTORY_STACK = 'directory-stack'
+        DISPLAYS = 'displays'
+        DOMAINS = 'domains'
+        EXPANSIONS = 'expansions'
+        FILE_DESCRIPTORS = 'file-descriptors'
+        FILES = 'files'
+        FONTS = 'fonts'
+        FSTYPES = 'fstypes'
+        FUNCTIONS = 'functions'
+        GLOBBED_FILES = 'globbed-files'
+        GROUPS = 'groups'
+        HISTORY_WORDS = 'history-words'
+        HOSTS = 'hosts'
+        INDEXES = 'indexes'
+        JOBS = 'jobs'
+        INTERFACES = 'interfaces'
+        KEYMAPS = 'keymaps'
+        KEYSYMS = 'keysyms'
+        LIBRARIES = 'libraries'
+        LIMITS = 'limits'
+        LOCAL_DIRECTORIES = 'local-directories'
+        MANUALS = 'manuals'
+        MAILBOXES = 'mailboxes'
+        MAPS = 'maps'
+        MESSAGES = 'messages'
+        MODIFIERS = 'modifiers'
+        MODULES = 'modules'
+        MY_ACCOUNTS = 'my-accounts'
+        NAMED_DIRECTORIES = 'named-directories'
+        NAMES = 'names'
+        NEWSGROUPS = 'newsgroups'
+        NICKNAMES = 'nicknames'
+        OPTIONS = 'options'
+        ORIGINAL = 'original'
+        OTHER_ACCOUNTS = 'other-accounts'
+        PACKAGES = 'packages'
+        PARAMETERS = 'parameters'
+        PATH_DIRECTORIES = 'path-directories'
+        PATHS = 'paths'
+        PODS = 'pods'
+        PORTS = 'ports'
+        PREFIXES = 'prefixes'
+        PRINTERS = 'printers'
+        PROCESSES = 'processes'
+        PROCESSES_NAMES = 'processes-names'
+        SEQUENCES = 'sequences'
+        SESSIONS = 'sessions'
+        SIGNALS = 'signals'
+        STRINGS = 'strings'
+        STYLES = 'styles'
+        SUFFIXES = 'suffixes'
+        TAGS = 'tags'
+        TARGETS = 'targets'
+        TIME_ZONES = 'time-zones'
+        TYPES = 'types'
+        URLS = 'urls'
+        USERS = 'users'
+        VALUES = 'values'
+        VARIANT = 'variant'
+        VISUALS = 'visuals'
+        WARNINGS = 'warnings'
+        WIDGETS = 'widgets'
+        WINDOWS = 'windows'
+        ZSH_OPTIONS = 'zsh-options'
