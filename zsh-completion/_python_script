@@ -11,6 +11,27 @@ _python_script() {
     _arguments -s -w : ${arguments[@]}
 }
 
+
+### The following code is taken from the argcomplete project, including
+### original copyright. Changes from the original will be marked by a comment
+### Starting with CHANGE.
+### Original code:
+### https://github.com/kislyuk/argcomplete/blob/v1.11.1/argcomplete/bash_completion.d/python-argcomplete
+
+# Copyright 2012-2019, Andrey Kislyuk and argcomplete contributors.
+# Licensed under the Apache License. See https://github.com/kislyuk/argcomplete for more info.
+
+# Copy of __expand_tilde_by_ref from bash-completion
+__python_argcomplete_expand_tilde_by_ref () {
+    if [ "${!1:0:1}" = "~" ]; then
+        if [ "${!1}" != "${!1//\/}" ]; then
+            eval $1="${!1/%\/*}"/'${!1#*/}';
+        else
+            eval $1="${!1}";
+        fi;
+    fi
+}
+
 # Run something, muting output or redirecting it to the debug stream
 # depending on the value of _ARC_DEBUG.
 __python_argcomplete_run() {
@@ -19,4 +40,13 @@ __python_argcomplete_run() {
     else
         "$@" 8>&1 9>&2 1>&9 2>&1
     fi
+}
+
+# Scan the beginning of an executable file ($1) for a regexp ($2). By default,
+# scan for the magic string indicating that the executable supports the
+# argcomplete completion protocol. By default, scan the first kilobyte;
+# if $3 is set to -n, scan until the first line break up to a kilobyte.
+__python_argcomplete_scan_head() {
+    read -s -r ${3:--N} 1024 < "$1"
+    [[ "$REPLY" =~ ${2:-PYTHON_ARGCOMPLETE_OK} ]]
 }
