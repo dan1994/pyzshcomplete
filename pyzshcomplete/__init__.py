@@ -23,14 +23,18 @@ args = parser.parse_args()
 '''
 
 
-from os import environ
-from sys import exit, stderr
+from os import environ, fdopen
+from sys import exit
 from argparse import ArgumentParser
 
 from pyzshcomplete.adapters.argparse.parser_adapter import ArgparseParserAdapter
 
 
 __all__ = ['autocomplete']
+
+COMPLETION_CONTEXT_ENVIRONMENT_VARIABLE = 'PYZSHCOMPLETE'
+COMPLETION_CONTEXT_OUTPUT_FD = 8
+COMPLETION_CONTEXT_ERROR_FD = 9
 
 
 def autocomplete(parser):
@@ -39,20 +43,38 @@ def autocomplete(parser):
     if not _running_in_autocompletion_context():
         return
 
-    try:
-        parser_adapter = _parser_adapter(parser)
-    except TypeError as e:
-        stderr.write(e)
+    output_stream, error_stream = _get_streams()
 
-    arguments_as_string = str(parser_adapter)
-    print(arguments_as_string)
+    try:
+        arguments_as_string = _autocomplete(parser)
+    except TypeError as e:
+        error_stream.write(e)
+        exit(-1)
+
+    output_stream.write(arguments_as_string)
 
     found_arguments = 0 if len(arguments_as_string) > 0 else -1
     exit(found_arguments)
 
 
 def _running_in_autocompletion_context():
-    return 'PYZSHCOMPLETE' in environ
+    return COMPLETION_CONTEXT_ENVIRONMENT_VARIABLE in environ
+
+
+def _get_streams():
+    try:
+        return fdopen(COMPLETION_CONTEXT_OUTPUT_FD, 'w'), \
+            fdopen(COMPLETION_CONTEXT_ERROR_FD, 'w')
+    except:
+        exit(-1)
+
+
+def _autocomplete(parser):
+    '''This function returns the completions as a string. This allows easier
+    testing without having to capture output streams.'''
+
+    parser_adapter = _parser_adapter(parser)
+    return str(parser_adapter)
 
 
 def _parser_adapter(parser):

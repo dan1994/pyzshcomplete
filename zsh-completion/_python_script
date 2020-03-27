@@ -1,10 +1,22 @@
 #compdef -p *.py
 
-function _python_script() {
+_python_script() {
     # Skip any other completion function
     _compskip=all
 
     local script=${words[1]}
-    local arguments=(${(f)"$(PYZSHCOMPLETE=1 ${script} 2> /dev/null)"})
+    local arguments=(
+        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${script})"}
+    )
     _arguments -s -w : ${arguments[@]}
+}
+
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+__python_argcomplete_run() {
+    if [[ -z "$_ARC_DEBUG" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1
+    fi
 }
