@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from sys import stderr
 
 from pyzshcomplete.utils.zsh_constants import ZshConstants
 
@@ -158,8 +157,8 @@ class ArgumentAdapter(ArgumentAdapterInterface):
             if self.is_flag:
                 return self._flag_argument_to_string()
             return self._positional_argument_to_string()
-        except Exception as e:
-            stderr.write('Skipping argument due to an exception: {}'.format(e))
+        except:
+            # Skip the argument without stopping the entire autocompletion
             return ''
 
     def _flag_argument_to_string(self):

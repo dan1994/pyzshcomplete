@@ -1,19 +1,12 @@
-from pyzshcomplete import autocomplete
-from pytest import fixture, raises
+from pytest import fixture
 
-import os
-
-
-os.environ['PYZSHCOMPLETE'] = '1'
+from pyzshcomplete import _autocomplete
 
 
 @fixture(scope='function')
-def autocomplete_and_compare(capsys):
+def autocomplete_and_compare():
     def _autocomplete_and_compare(parser, expected):
-        with raises(SystemExit):
-            autocomplete(parser)
-        output = capsys.readouterr().out
-        options = output.split('\n')[:-1]
-        assert options == expected
+        actual = _autocomplete(parser).split('\n')
+        assert actual == expected
 
     return _autocomplete_and_compare
