@@ -21,12 +21,10 @@ While having a workaround for ``zsh`` (which just enables compatibility for ``ba
 Installation
 ============
 
-**NOTE**: ``activate_pyzshcomplete`` will be installed in ``~/.local/bin``, so make sure it's in your ``PATH``.
-
 .. code-block:: zsh
 
     pip install pyzshcomplete
-    sudo activate_pyzshcomplete
+    sudo ~/.local/bin/activate_pyzshcomplete
 
 Restart ``zsh`` after the installation is complete.
 
