@@ -1,10 +1,13 @@
 #compdef -p *.py
 
 _python_script() {
+    local script=${words[1]}
+
+    __python_argcomplete_scan_head ${script} || return 1
+
     # Skip any other completion function
     _compskip=all
 
-    local script=${words[1]}
     local arguments=(
         ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${script})"}
     )
@@ -44,9 +47,9 @@ __python_argcomplete_run() {
 
 # Scan the beginning of an executable file ($1) for a regexp ($2). By default,
 # scan for the magic string indicating that the executable supports the
-# argcomplete completion protocol. By default, scan the first kilobyte;
-# if $3 is set to -n, scan until the first line break up to a kilobyte.
+# argcomplete completion protocol. Scan the first kilobyte.
 __python_argcomplete_scan_head() {
-    read -s -r ${3:--N} 1024 < "$1"
+    # CHANGE: the zsh read builtin has different options and behaves differently
+    read -s -r -k 1024 -u 0 < "$1"
     [[ "$REPLY" =~ ${2:-PYTHON_ARGCOMPLETE_OK} ]]
 }
