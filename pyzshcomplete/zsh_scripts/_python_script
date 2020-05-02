@@ -1,17 +1,34 @@
-#compdef -p *.py
+#compdef -p *
 
 _python_script() {
-    local script=${words[1]}
+    # Expand all words
+    local -a expanded_words
+    __pyzshcomplete_exapnd_tilde_in_all_words
 
-    __python_argcomplete_scan_head ${script} || return 1
+    # Check if we should run or else quit
+    __pyzshcomplete_should_run || return 1
 
     # Skip any other completion function
     _compskip=all
 
+    # Retrieve valid completions and pass them to _arguments
     local arguments=(
-        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${script})"}
+        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${expanded_words[@]})"}
     )
     _arguments -s -w : ${arguments[@]}
+
+    # Always return 0 - if _arguments fails, compsys for some reason invokes
+    # this script again consuming more time and gaining nothing.
+    # If we are in this context there shouldn't be other completions anyways so
+    # no reason to return 1 anyways...
+    return 0
+}
+
+
+__pyzshcomplete_exapnd_tilde_in_all_words() {
+    for ((i = 1; i <= $#words; i++)); do
+        expanded_words[$i]=${~words[$i]}
+    done
 }
 
 
@@ -24,15 +41,39 @@ _python_script() {
 # Copyright 2012-2019, Andrey Kislyuk and argcomplete contributors.
 # Licensed under the Apache License. See https://github.com/kislyuk/argcomplete for more info.
 
-# Copy of __expand_tilde_by_ref from bash-completion
-__python_argcomplete_expand_tilde_by_ref () {
-    if [ "${!1:0:1}" = "~" ]; then
-        if [ "${!1}" != "${!1//\/}" ]; then
-            eval $1="${!1/%\/*}"/'${!1#*/}';
-        else
-            eval $1="${!1}";
-        fi;
+# CHANGE: This function is a heavily refactored copy of the first part of
+# _python_argcomplete_global
+__pyzshcomplete_should_run() {
+    local executable=${expanded_words[1]}
+
+    if [[ $executable == python* ]] || [[ $executable == pypy* ]]; then
+        # If 2nd word is the -m flag, check that the module has the magic string
+        [[ ${expanded_words[2]} == -m ]] && __python_argcomplete_run \
+            $executable -m argcomplete._check_module ${expanded_words[3]} && \
+            return 0
+        # If 2nd word is a file, check that it has the magic string
+        [[ -f ${expanded_words[2]} ]] && __python_argcomplete_scan_head_noerr \
+            ${expanded_words[2]} && return 0
+        return 1
     fi
+
+    # Assume the first word is a script and find its path
+    local script_path
+    # Search in path
+    if type -p $executable > /dev/null 2>&1; then
+        script_path=$(type -p $executable | sed -r "s:$executable is ::")
+    # Check if it's a file
+    elif [[ -f $executable ]]; then
+        script_path=$executable
+    fi
+
+    # If found a path, scan for magic
+    if [[ -n $script_path ]]; then
+        __python_argcomplete_scan_head_noerr $script_path && return 0
+        return 1
+    fi
+
+    return 1
 }
 
 # Run something, muting output or redirecting it to the debug stream
@@ -52,4 +93,8 @@ __python_argcomplete_scan_head() {
     # CHANGE: the zsh read builtin has different options and behaves differently
     read -s -r -k 1024 -u 0 < "$1"
     [[ "$REPLY" =~ ${2:-PYTHON_ARGCOMPLETE_OK} ]]
+}
+
+__python_argcomplete_scan_head_noerr() {
+    __python_argcomplete_scan_head "$@" 2>/dev/null
 }
