@@ -24,7 +24,6 @@ if not isdir(target_dir):
 pyzshcomplete_root_dir = dirname(pyzshcomplete.__file__)
 zsh_scripts_dir = join(pyzshcomplete_root_dir, 'zsh_scripts')
 scripts = glob(join(zsh_scripts_dir, '*'))
-print(scripts)
 for script in scripts:
     copy2(script, target_dir)
 
