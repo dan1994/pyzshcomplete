@@ -1,8 +1,20 @@
-#compdef -p *
+#compdef -P *.py
 
 _python_script() {
-    # Expand all words
-    local -a expanded_words
+    # __pyzshcomplete_orig_words is set by another completion script to contain
+    # a copy of words before any other completion script (such as `_python`)
+    # manipulates and changes them.
+    # This is required to make sure that the commandline we try to run later on
+    # can actually be run.
+    # Example of when this is relevant: Given the commandline
+    # `python script.py`, the completion flow will go through the `_python`
+    # completion script first, which will remove the first word and then call
+    # this script with words=`script.py`, that will fail to run.
+    # Side note: We could theoretically use the BUFFER variable, which contains
+    # the raw commandline, but using a copy of words gives us alias expansion
+    # for free, which is not trivial to duplicate.
+    local -a expanded_orig_words=(${(z)__pyzshcomplete_orig_words})
+    local -a expanded_words=(${(z)words})
     __pyzshcomplete_exapnd_tilde_in_all_words
 
     # Check if we should run or else quit
@@ -13,22 +25,43 @@ _python_script() {
 
     # Retrieve valid completions and pass them to _arguments
     local arguments=(
-        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${expanded_words[@]})"}
+        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${expanded_orig_words[@]})"}
     )
     _arguments -s -w : ${arguments[@]}
 
     # Always return 0 - if _arguments fails, compsys for some reason invokes
     # this script again consuming more time and gaining nothing.
-    # If we are in this context there shouldn't be other completions anyways so
-    # no reason to return 1 anyways...
+    # If we are in this context there shouldn't be other completions so no
+    # reason to return 1 anyways...
     return 0
 }
 
-
 __pyzshcomplete_exapnd_tilde_in_all_words() {
-    for ((i = 1; i <= $#words; i++)); do
-        expanded_words[$i]=${~words[$i]}
+    for ((i = 1; i <= $#expanded_orig_words; i++)); do
+        expanded_orig_words[$i]=${~expanded_orig_words[$i]}
     done
+    for ((i = 1; i <= $#expanded_words; i++)); do
+        expanded_words[$i]=${~expanded_words[$i]}
+    done
+}
+
+__pyzshcomplete_should_run() {
+    __pyzshcomplete_scan_python_script_for_magic
+}
+
+__pyzshcomplete_scan_python_script_for_magic() {
+    local script_path
+    __pyzshcomplete_find_script_path
+    [[ -n $script_path ]] && __python_argcomplete_scan_head_noerr $script_path
+}
+
+__pyzshcomplete_find_script_path() {
+    local script=${expanded_words[1]}
+    if type -p $script > /dev/null 2>&1; then
+        script_path=$(type -p $script | sed -r "s:$script is ::")
+    elif [[ -f $script ]]; then
+        script_path=$script
+    fi
 }
 
 
@@ -40,41 +73,6 @@ __pyzshcomplete_exapnd_tilde_in_all_words() {
 
 # Copyright 2012-2019, Andrey Kislyuk and argcomplete contributors.
 # Licensed under the Apache License. See https://github.com/kislyuk/argcomplete for more info.
-
-# CHANGE: This function is a heavily refactored copy of the first part of
-# _python_argcomplete_global
-__pyzshcomplete_should_run() {
-    local executable=${expanded_words[1]}
-
-    if [[ $executable == python* ]] || [[ $executable == pypy* ]]; then
-        # If 2nd word is the -m flag, check that the module has the magic string
-        [[ ${expanded_words[2]} == -m ]] && __python_argcomplete_run \
-            $executable -m argcomplete._check_module ${expanded_words[3]} && \
-            return 0
-        # If 2nd word is a file, check that it has the magic string
-        [[ -f ${expanded_words[2]} ]] && __python_argcomplete_scan_head_noerr \
-            ${expanded_words[2]} && return 0
-        return 1
-    fi
-
-    # Assume the first word is a script and find its path
-    local script_path
-    # Search in path
-    if type -p $executable > /dev/null 2>&1; then
-        script_path=$(type -p $executable | sed -r "s:$executable is ::")
-    # Check if it's a file
-    elif [[ -f $executable ]]; then
-        script_path=$executable
-    fi
-
-    # If found a path, scan for magic
-    if [[ -n $script_path ]]; then
-        __python_argcomplete_scan_head_noerr $script_path && return 0
-        return 1
-    fi
-
-    return 1
-}
 
 # Run something, muting output or redirecting it to the debug stream
 # depending on the value of _ARC_DEBUG.
