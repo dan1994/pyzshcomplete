@@ -20,11 +20,13 @@ if not isdir(target_dir):
                  'pyzshcomplete issue tracker.\n'.format(target_dir))
     exit(-1)
 
-# Copy zsh completion script so it will be automatically identified by compsys
+# Copy zsh completion scripts so they'll be automatically identified by compsys
 pyzshcomplete_root_dir = dirname(pyzshcomplete.__file__)
-src = join(pyzshcomplete_root_dir, 'zsh_scripts', '_python_script')
-dst = join(target_dir)
-copy2(src, dst)
+zsh_scripts_dir = join(pyzshcomplete_root_dir, 'zsh_scripts')
+scripts = glob(join(zsh_scripts_dir, '*'))
+print(scripts)
+for script in scripts:
+    copy2(script, target_dir)
 
 
 # Delete compsys cache files to make sure the function will be autoloaded
