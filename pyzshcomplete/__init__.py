@@ -7,7 +7,7 @@ In order to use pyzshcomplete, add the following comment at the top of your
 script:
 
 ```python
-# PYTHON_ARGCOMPLETE_OK
+# PYZSHCOMPLETE_OK
 ```
 
 then, after your parser is defined, and before the actual parsing is done, add a

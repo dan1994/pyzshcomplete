@@ -90,7 +90,7 @@ __python_argcomplete_run() {
 __python_argcomplete_scan_head() {
     # CHANGE: the zsh read builtin has different options and behaves differently
     read -s -r -k 1024 -u 0 < "$1"
-    [[ "$REPLY" =~ ${2:-PYTHON_ARGCOMPLETE_OK} ]]
+    [[ "$REPLY" =~ ${2:-PYZSHCOMPLETE_OK} ]]
 }
 
 __python_argcomplete_scan_head_noerr() {
