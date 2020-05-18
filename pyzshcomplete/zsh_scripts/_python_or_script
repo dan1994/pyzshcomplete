@@ -12,6 +12,7 @@
 
 _python_or_script() {
   # Save a backup of words
+  local __pyzshcomplete_orig_words
   _python_script_words_backup
 
   # Call _python directly and avoid default fallbacks
