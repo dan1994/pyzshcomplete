@@ -1,17 +1,17 @@
 #compdef -P *.py
 
 _python_script() {
-    # __pyzshcomplete_orig_words is set by another completion script to contain
-    # a copy of words before any other completion script (such as `_python`)
-    # manipulates and changes them.
-    # This is required to make sure that the commandline we try to run later on
+    # __pyzshcomplete_orig_words is set by another completion function in order
+    # to make sure we have the entire command line even after the _python
+    # completion function is called (_python shifts words).
+    # This is required to make sure that the command line we try to run later on
     # can actually be run.
-    # Example of when this is relevant: Given the commandline
+    # Example of why this is relevant: Given the command line
     # `python script.py`, the completion flow will go through the `_python`
-    # completion script first, which will remove the first word and then call
-    # this script with words=`script.py`, that will fail to run.
+    # completion function first, which will remove the first word and then call
+    # this function with words=`script.py`, that will fail to run.
     # Side note: We could theoretically use the BUFFER variable, which contains
-    # the raw commandline, but using a copy of words gives us alias expansion
+    # the raw command line, but using a copy of words gives us alias expansion
     # for free, which is not trivial to duplicate.
     local -a expanded_orig_words=(${(z)__pyzshcomplete_orig_words})
     local -a expanded_words=(${(z)words})
@@ -28,12 +28,6 @@ _python_script() {
         ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${expanded_orig_words[@]})"}
     )
     _arguments -s -w : ${arguments[@]}
-
-    # Always return 0 - if _arguments fails, compsys for some reason invokes
-    # this script again consuming more time and gaining nothing.
-    # If we are in this context there shouldn't be other completions so no
-    # reason to return 1 anyways...
-    return 0
 }
 
 __pyzshcomplete_exapnd_tilde_in_all_words() {
