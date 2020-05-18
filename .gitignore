@@ -3,5 +3,7 @@
 
 # Python
 *.pyc
-venv/
 .pytest_cache/
+/build
+/dist
+/*.egg*

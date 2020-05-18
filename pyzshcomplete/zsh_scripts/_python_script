@@ -1,0 +1,108 @@
+#compdef -P *.py
+
+_python_script() {
+    # __pyzshcomplete_orig_words is set by another completion function in order
+    # to make sure we have the entire command line even after the _python
+    # completion function is called (_python shifts words).
+    # This is required to make sure that the command line we try to run later on
+    # can actually be run.
+    # Example of why this is relevant: Given the command line
+    # `python script.py`, the completion flow will go through the `_python`
+    # completion function first, which will remove the first word and then call
+    # this function with words=`script.py`, that will fail to run.
+    # Side note: We could theoretically use the BUFFER variable, which contains
+    # the raw command line, but using a copy of words gives us alias expansion
+    # for free, which is not trivial to duplicate.
+    local -a expanded_words=(${(z)words})
+    local -a expanded_orig_words
+    __pyzshcomplete_get_orig_words
+    __pyzshcomplete_exapnd_tilde_in_all_words
+
+    # Check if we should run or else quit
+    __pyzshcomplete_should_run || return 1
+
+    # Skip any other completion function
+    _compskip=all
+
+    # Retrieve valid completions and pass them to _arguments
+    local arguments=(
+        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${expanded_orig_words[@]})"}
+    )
+    _arguments -s -w : ${arguments[@]}
+
+    # Always return 0 for consistency:
+    # When the command line is `./script.py` the `_compskip=all` prevents any
+    # fallback matches.
+    # When the command line is `python ./script.py` it doesn't.
+    # Returning 0 makes sure no fallback matches will be added.
+    return 0
+}
+
+__pyzshcomplete_get_orig_words() {
+    if [[ -n ${__pyzshcomplete_orig_words[@]} ]]; then
+        expanded_orig_words=(${(z)__pyzshcomplete_orig_words})
+    else
+        expanded_orig_words=(${(z)words})
+    fi
+}
+
+__pyzshcomplete_exapnd_tilde_in_all_words() {
+    for ((i = 1; i <= $#expanded_orig_words; i++)); do
+        expanded_orig_words[$i]=${~expanded_orig_words[$i]}
+    done
+    for ((i = 1; i <= $#expanded_words; i++)); do
+        expanded_words[$i]=${~expanded_words[$i]}
+    done
+}
+
+__pyzshcomplete_should_run() {
+    __pyzshcomplete_scan_python_script_for_magic
+}
+
+__pyzshcomplete_scan_python_script_for_magic() {
+    local script_path
+    __pyzshcomplete_find_script_path
+    [[ -n $script_path ]] && __python_argcomplete_scan_head_noerr $script_path
+}
+
+__pyzshcomplete_find_script_path() {
+    local script=${expanded_words[1]}
+    if type -p $script > /dev/null 2>&1; then
+        script_path=$(type -p $script | sed -r "s:$script is ::")
+    elif [[ -f $script ]]; then
+        script_path=$script
+    fi
+}
+
+
+### The following code is taken from the argcomplete project, including
+### original copyright. Changes from the original will be marked by a comment
+### Starting with CHANGE.
+### Original code:
+### https://github.com/kislyuk/argcomplete/blob/v1.11.1/argcomplete/bash_completion.d/python-argcomplete
+
+# Copyright 2012-2019, Andrey Kislyuk and argcomplete contributors.
+# Licensed under the Apache License. See https://github.com/kislyuk/argcomplete for more info.
+
+# Run something, muting output or redirecting it to the debug stream
+# depending on the value of _ARC_DEBUG.
+__python_argcomplete_run() {
+    if [[ -z "$_ARC_DEBUG" ]]; then
+        "$@" 8>&1 9>&2 1>/dev/null 2>&1
+    else
+        "$@" 8>&1 9>&2 1>&9 2>&1
+    fi
+}
+
+# Scan the beginning of an executable file ($1) for a regexp ($2). By default,
+# scan for the magic string indicating that the executable supports the
+# argcomplete completion protocol. Scan the first kilobyte.
+__python_argcomplete_scan_head() {
+    # CHANGE: the zsh read builtin has different options and behaves differently
+    read -s -r -k 1024 -u 0 < "$1"
+    [[ "$REPLY" =~ ${2:-PYZSHCOMPLETE_OK} ]]
+}
+
+__python_argcomplete_scan_head_noerr() {
+    __python_argcomplete_scan_head "$@" 2>/dev/null
+}
