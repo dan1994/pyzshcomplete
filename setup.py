@@ -17,7 +17,12 @@ setup(
         'Issue Tracker': 'https://github.com/dan1994/pyzshcomplete/issues'
     },
     packages=find_packages(),
-    package_data={'pyzshcomplete': ['zsh_scripts/_python_script']},
+    package_data={
+        'pyzshcomplete': [
+            'zsh_scripts/_python_script',
+            'zsh_scripts/_python_script_words_backup'
+        ]
+    },
     include_package_data=True,
     install_requires=[],
     tests_require=[

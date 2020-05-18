@@ -1,17 +1,67 @@
-#compdef -p *.py
+#compdef -P *.py
 
 _python_script() {
-    local script=${words[1]}
+    # __pyzshcomplete_orig_words is set by another completion script to contain
+    # a copy of words before any other completion script (such as `_python`)
+    # manipulates and changes them.
+    # This is required to make sure that the commandline we try to run later on
+    # can actually be run.
+    # Example of when this is relevant: Given the commandline
+    # `python script.py`, the completion flow will go through the `_python`
+    # completion script first, which will remove the first word and then call
+    # this script with words=`script.py`, that will fail to run.
+    # Side note: We could theoretically use the BUFFER variable, which contains
+    # the raw commandline, but using a copy of words gives us alias expansion
+    # for free, which is not trivial to duplicate.
+    local -a expanded_orig_words=(${(z)__pyzshcomplete_orig_words})
+    local -a expanded_words=(${(z)words})
+    __pyzshcomplete_exapnd_tilde_in_all_words
 
-    __python_argcomplete_scan_head ${script} || return 1
+    # Check if we should run or else quit
+    __pyzshcomplete_should_run || return 1
 
     # Skip any other completion function
     _compskip=all
 
+    # Retrieve valid completions and pass them to _arguments
     local arguments=(
-        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${script})"}
+        ${(f)"$(PYZSHCOMPLETE=1 __python_argcomplete_run ${expanded_orig_words[@]})"}
     )
     _arguments -s -w : ${arguments[@]}
+
+    # Always return 0 - if _arguments fails, compsys for some reason invokes
+    # this script again consuming more time and gaining nothing.
+    # If we are in this context there shouldn't be other completions so no
+    # reason to return 1 anyways...
+    return 0
+}
+
+__pyzshcomplete_exapnd_tilde_in_all_words() {
+    for ((i = 1; i <= $#expanded_orig_words; i++)); do
+        expanded_orig_words[$i]=${~expanded_orig_words[$i]}
+    done
+    for ((i = 1; i <= $#expanded_words; i++)); do
+        expanded_words[$i]=${~expanded_words[$i]}
+    done
+}
+
+__pyzshcomplete_should_run() {
+    __pyzshcomplete_scan_python_script_for_magic
+}
+
+__pyzshcomplete_scan_python_script_for_magic() {
+    local script_path
+    __pyzshcomplete_find_script_path
+    [[ -n $script_path ]] && __python_argcomplete_scan_head_noerr $script_path
+}
+
+__pyzshcomplete_find_script_path() {
+    local script=${expanded_words[1]}
+    if type -p $script > /dev/null 2>&1; then
+        script_path=$(type -p $script | sed -r "s:$script is ::")
+    elif [[ -f $script ]]; then
+        script_path=$script
+    fi
 }
 
 
@@ -23,17 +73,6 @@ _python_script() {
 
 # Copyright 2012-2019, Andrey Kislyuk and argcomplete contributors.
 # Licensed under the Apache License. See https://github.com/kislyuk/argcomplete for more info.
-
-# Copy of __expand_tilde_by_ref from bash-completion
-__python_argcomplete_expand_tilde_by_ref () {
-    if [ "${!1:0:1}" = "~" ]; then
-        if [ "${!1}" != "${!1//\/}" ]; then
-            eval $1="${!1/%\/*}"/'${!1#*/}';
-        else
-            eval $1="${!1}";
-        fi;
-    fi
-}
 
 # Run something, muting output or redirecting it to the debug stream
 # depending on the value of _ARC_DEBUG.
@@ -52,4 +91,8 @@ __python_argcomplete_scan_head() {
     # CHANGE: the zsh read builtin has different options and behaves differently
     read -s -r -k 1024 -u 0 < "$1"
     [[ "$REPLY" =~ ${2:-PYTHON_ARGCOMPLETE_OK} ]]
+}
+
+__python_argcomplete_scan_head_noerr() {
+    __python_argcomplete_scan_head "$@" 2>/dev/null
 }
