@@ -2,6 +2,8 @@
 
 from setuptools import setup, find_packages
 from glob import glob
+from os import listdir
+from os.path import join
 
 
 setup(
@@ -18,10 +20,8 @@ setup(
     },
     packages=find_packages(),
     package_data={
-        'pyzshcomplete': [
-            'zsh_scripts/_python_script',
-            'zsh_scripts/_python_script_words_backup'
-        ]
+        'pyzshcomplete': [join('zsh_scripts', script) for script in
+                          listdir('pyzshcomplete/zsh_scripts')]
     },
     include_package_data=True,
     install_requires=[],
