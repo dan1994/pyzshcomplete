@@ -1,6 +1,0 @@
-#compdef -first-
-
-_python_script_words_backup() {
-    # Save a backup of words
-    __pyzshcomplete_orig_words=$words
-}
