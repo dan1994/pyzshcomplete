@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+from os.path import isdir, join, dirname, expanduser
+from os import geteuid, remove
+from sys import stderr, exit
+from shutil import copy2
+from glob import glob
+
+import pyzshcomplete
+
+
+if geteuid() != 0:
+    stderr.write('Need to run as root to install pyzshcomplete. Abroting...\n')
+    exit(-1)
+
+target_dir = '/usr/share/zsh/functions/Completion/Unix'
+if not isdir(target_dir):
+    stderr.write('Can\'t find zsh completion folder. It should be located in '
+                 '{}. If you see this error, please report it on the '
+                 'pyzshcomplete issue tracker.\n'.format(target_dir))
+    exit(-1)
+
+# Copy zsh completion script so it will be automatically identified by compsys
+pyzshcomplete_root_dir = dirname(pyzshcomplete.__file__)
+src = join(pyzshcomplete_root_dir, 'zsh_scripts', '_python_script')
+dst = join(target_dir)
+copy2(src, dst)
+
+
+# Delete compsys cache files to make sure the function will be autoloaded
+zsh_completion_cache_files = glob(expanduser('~/.zcompdump*'))
+for cache_file in zsh_completion_cache_files:
+    remove(cache_file)
+
+
+print('pyzshcomplete was activated successfully!')
+print('Restart zsh for changes to take effect')

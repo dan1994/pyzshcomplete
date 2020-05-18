@@ -22,7 +22,7 @@ jobs:
             - "venv"
       - run:
           command: |
-            pipenv run python -m pytest -vv -s tests
+            pipenv run python -m pytest -vv -s pyzshcomplete/tests
       - store_test_results:
           path: test-results
       - store_artifacts:
