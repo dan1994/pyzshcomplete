@@ -1,0 +1,24 @@
+#compdef -p python[0-9.]#
+
+# The purpose of this script is to catch command lines of the form
+# `python script.py` before they are passed to the builtin _python completion
+# function.
+# By doing this we can affect the completion flow in 2 ways:
+# 1. Backup the original words array that is manipulated by _python before the
+#    _python_script function is invoked.
+# 2. Make sure that _normal doesn't fallback to default matches when it
+#    shouldn't. This can't be done by setting _compskip at _python_script
+#    because it will not be in the correct scope.
+
+_python_or_script() {
+  # Save a backup of words
+  local __pyzshcomplete_orig_words
+  _python_script_words_backup
+
+  # Call _python directly and avoid default fallbacks
+  _python "$@" && _compskip=all
+}
+
+_python_script_words_backup() {
+    __pyzshcomplete_orig_words=$words
+}
