@@ -77,6 +77,15 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
         return isinstance(self._argument, (_HelpAction, _VersionAction))
 
     @property
+    def exclusion_list(self):
+        exclusions = set()
+        for group in self._parser._mutually_exclusive_groups:
+            if self._argument in group._group_actions:
+                exclusions |= self._group_exclusions(group)
+        exclusions -= set(self.flags)
+        return list(exclusions)
+
+    @property
     def can_repeat(self):
         return isinstance(self._argument, (_AppendAction, _AppendConstAction,
                                            _ExtendAction, _CountAction))
@@ -100,3 +109,10 @@ class ArgparseArgumentAdapter(ArgumentAdapter):
     @property
     def completion_choices(self):
         return self._argument.choices
+
+    def _group_exclusions(self, group):
+        exclusions = set()
+        for action in group._group_actions:
+            for flag in action.option_strings:
+                exclusions |= set([flag])
+        return exclusions

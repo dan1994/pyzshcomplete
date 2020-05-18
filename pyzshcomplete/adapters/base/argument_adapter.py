@@ -83,6 +83,12 @@ class ArgumentAdapterInterface(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def exclusion_list(self):
+        '''A list of other option flags that cannot be used with this flag'''
+        return
+
+    @property
+    @abstractmethod
     def can_repeat(self):
         '''
         True if the argument can be supplied multiple times
@@ -200,9 +206,14 @@ class ArgumentAdapter(ArgumentAdapterInterface):
                 ZshConstants.Exclusion.FLAGS
             )
             return '({})'.format(all_exclusions)
-        if self.can_repeat:
+
+        exclusion_list = self.exclusion_list
+        if not self.can_repeat:
+            exclusion_list = self.flags + exclusion_list
+
+        if len(exclusion_list) == 0:
             return ''
-        return '({})'.format(' '.join(self.flags))
+        return '({})'.format(' '.join(exclusion_list))
 
     def _can_repeat_to_string(self):
         return ZshConstants.REPEATING_ARGUMENT if self.can_repeat else ''
