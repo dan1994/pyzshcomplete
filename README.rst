@@ -24,7 +24,7 @@ Installation
 .. code-block:: zsh
 
     pip install pyzshcomplete
-    sudo ~/.local/bin/activate_pyzshcomplete
+    ~/.local/bin/activate_pyzshcomplete
 
 Restart ``zsh`` after the installation is complete.
 
