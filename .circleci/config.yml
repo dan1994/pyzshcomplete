@@ -3,13 +3,13 @@ jobs:
   build:
     working_directory: ~/circleci-pyzshcomplete
     docker:
-      - image: circleci/python:3.6.10
+      - image: circleci/python:3.8.3
         environment:
           PIPENV_VENV_IN_PROJECT: true
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
       - restore_cache:
           key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
