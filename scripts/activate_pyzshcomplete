@@ -1,38 +1,88 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 from os.path import isdir, join, dirname, expanduser
-from os import geteuid, remove
+from os import remove, geteuid
+from subprocess import run
 from sys import stderr, exit
-from shutil import copy2
 from glob import glob
 
-import pyzshcomplete
+
+def main():
+    try:
+        avoid_running_as_super_user_implicitly()
+        copy_completion_scripts()
+        remove_completion_system_cache_files()
+        print_success_message()
+    except Exception as e:
+        stderr.write('An error occured during installation: {}\n'.
+            format(str(e)))
+        exit(-1)
 
 
-if geteuid() != 0:
-    stderr.write('Need to run as root to install pyzshcomplete. Abroting...\n')
-    exit(-1)
-
-target_dir = '/usr/share/zsh/functions/Completion/Unix'
-if not isdir(target_dir):
-    stderr.write('Can\'t find zsh completion folder. It should be located in '
-                 '{}. If you see this error, please report it on the '
-                 'pyzshcomplete issue tracker.\n'.format(target_dir))
-    exit(-1)
-
-# Copy zsh completion scripts so they'll be automatically identified by compsys
-pyzshcomplete_root_dir = dirname(pyzshcomplete.__file__)
-zsh_scripts_dir = join(pyzshcomplete_root_dir, 'zsh_scripts')
-scripts = glob(join(zsh_scripts_dir, '*'))
-for script in scripts:
-    copy2(script, target_dir)
+def avoid_running_as_super_user_implicitly():
+    if geteuid() == 0:
+        if input('You seem to be running as a super user. If you have a user '
+                'account for which you would like to activate pyzshcomplete, '
+                'you should run this script from that user. Root priviledges '
+                'will be asked for when needed. \nContinue? [y/N] ').lower() \
+                    != 'y':
+            print('Aborting...')
+            exit(0)
+        print('Continuing...')
 
 
-# Delete compsys cache files to make sure the function will be autoloaded
-zsh_completion_cache_files = glob(expanduser('~/.zcompdump*'))
-for cache_file in zsh_completion_cache_files:
-    remove(cache_file)
+def copy_completion_scripts():
+    print('Copying completion scripts... ')
+    scripts = get_completion_scripts()
+    target_dir = zsh_completion_function_dir()
+    perform_copy_as_root(scripts, target_dir)
 
 
-print('pyzshcomplete was activated successfully!')
-print('Restart zsh for changes to take effect')
+def remove_completion_system_cache_files():
+    print('Removing completion system cache files... ')
+    zsh_completion_cache_files = glob(expanduser('~/.zcompdump*'))
+    for cache_file in zsh_completion_cache_files:
+        try:
+            remove(cache_file)
+        except:
+            stderr.write('WARNING: Failed removing zsh cache file: {}. You can '
+                         'try to remove it manually.'.format(cache_file))
+
+
+def print_success_message():
+    print('pyzshcomplete was activated successfully!')
+    print('Restart zsh for changes to take effect')
+
+
+def zsh_completion_function_dir():
+    target_dir = '/usr/share/zsh/functions/Completion/Unix'
+    if not isdir(target_dir):
+        raise RuntimeError('Can\'t find zsh completion folder. It should be '
+                           'located in {}. If you see this error, please '
+                           'report it on the pyzshcomplete issue tracker.\n'.
+                           format(target_dir))
+    return target_dir
+
+
+def get_completion_scripts():
+    try:
+        import pyzshcomplete
+    except ImportError as e:
+        raise ImportError('{}: Make sure the module is installed for the user '
+                          'running the activation script'.format(str(e)))
+
+    pyzshcomplete_root_dir = dirname(pyzshcomplete.__file__)
+    zsh_scripts_dir = join(pyzshcomplete_root_dir, 'zsh_scripts')
+    return ' '.join(glob(join(zsh_scripts_dir, '*')))
+
+
+def perform_copy_as_root(source, target):
+    commandline = 'sudo cp {} {}'.format(source, target)
+    if run(commandline.split()).returncode != 0:
+        raise RuntimeError('Failed copying zsh completion scripts. Make sure '
+                           'to provide root access, as these files are copied '
+                           'to a global zsh dir owned by root\n')
+
+
+if __name__ == '__main__':
+    main()
