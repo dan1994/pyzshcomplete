@@ -2,7 +2,8 @@
 pyzshcomplete
 #############
 
-.. image:: https://github.com/dan1994/pyzshcomplete/workflows/Code%20scanning%20-%20action/badge.svg
+.. image:: https://github.com/dan1994/pyzshcomplete/workflows/Tests/badge.svg
+.. image:: https://github.com/dan1994/pyzshcomplete/workflows/Code%20Scanning/badge.svg
 
 Tab completion for arbitraty ``python`` scripts in ``zsh``.
 
