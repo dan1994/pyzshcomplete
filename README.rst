@@ -3,7 +3,9 @@ pyzshcomplete
 #############
 
 .. image:: https://github.com/dan1994/pyzshcomplete/workflows/Tests/badge.svg
+   :target: https://github.com/dan1994/pyzshcomplete/workflows/Tests/badge.svg
 .. image:: https://github.com/dan1994/pyzshcomplete/workflows/Code%20Scanning/badge.svg
+   :target: https://github.com/dan1994/pyzshcomplete/workflows/Code%20Scanning/badge.svg
 
 Tab completion for arbitraty ``python`` scripts in ``zsh``.
 
