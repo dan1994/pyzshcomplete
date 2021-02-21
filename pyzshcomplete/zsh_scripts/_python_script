@@ -74,6 +74,7 @@ __pyzshcomplete_find_script_path() {
     fi
 }
 
+_python_script "$@"
 
 ### The following code is taken from the argcomplete project, including
 ### original copyright. Changes from the original will be marked by a comment
