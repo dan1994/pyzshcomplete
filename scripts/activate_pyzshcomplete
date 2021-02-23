@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
-from os.path import isdir, join, dirname, expanduser
-from os import remove, geteuid
-from subprocess import run
+from os.path import join, dirname, expanduser
+from os import remove, geteuid, walk
+from subprocess import run, Popen, PIPE
 from sys import stderr, exit
 from glob import glob
 
@@ -10,7 +10,8 @@ from glob import glob
 def main():
     try:
         avoid_running_as_super_user_implicitly()
-        copy_completion_scripts()
+        completion_script_dir = find_completion_script_dir()
+        copy_completion_scripts(completion_script_dir)
         remove_completion_system_cache_files()
         print_success_message()
     except Exception as e:
@@ -31,10 +32,26 @@ def avoid_running_as_super_user_implicitly():
         print('Continuing...')
 
 
-def copy_completion_scripts():
+def find_completion_script_dir():
+    print('Locating zsh completion script directory...')
+
+    result = Popen(['echo $FPATH'], shell=True, executable='zsh', stdout=PIPE)
+    fpath = result.stdout.read().decode('ascii').strip()
+
+    for path in fpath.split(':'):
+        for root, _, files in walk(path):
+            if '_python' in files:
+                print(f'Installing in {root}')
+                return root
+
+    raise RuntimeError('Can\'t find zsh completion folder. If you see this '
+                        'error, please report it on the pyzshcomplete issue '
+                        'tracker.\n')
+
+
+def copy_completion_scripts(target_dir):
     print('Copying completion scripts... ')
     scripts = get_completion_scripts()
-    target_dir = zsh_completion_function_dir()
     perform_copy_as_root(scripts, target_dir)
 
 
@@ -52,16 +69,6 @@ def remove_completion_system_cache_files():
 def print_success_message():
     print('pyzshcomplete was activated successfully!')
     print('Restart zsh for changes to take effect')
-
-
-def zsh_completion_function_dir():
-    target_dir = '/usr/share/zsh/functions/Completion/Unix'
-    if not isdir(target_dir):
-        raise RuntimeError('Can\'t find zsh completion folder. It should be '
-                           'located in {}. If you see this error, please '
-                           'report it on the pyzshcomplete issue tracker.\n'.
-                           format(target_dir))
-    return target_dir
 
 
 def get_completion_scripts():
