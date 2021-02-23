@@ -9,8 +9,12 @@ pytest = "*"
 ipython = "*"
 autopep8 = "*"
 sphinx = "*"
+pylama = "*"
 
 [packages]
 
 [requires]
-python_version = "3.6"
+python_version = "3"
+
+[scripts]
+test = "pytest -vv pyzshcomplete/tests"

@@ -22,3 +22,5 @@ _python_or_script() {
 _python_script_words_backup() {
     __pyzshcomplete_orig_words=$words
 }
+
+_python_or_script "$@"
