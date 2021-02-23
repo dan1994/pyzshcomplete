@@ -25,6 +25,12 @@ While having a workaround for ``zsh`` (which just enables compatibility for ``ba
 ``pyzshcomplete`` was written to utilize as many of the features offered by ``zsh`` as possible.
 
 
+Prerequisites
+=============
+
+In order for completion to work in ``zsh``, the autocompletion module must be enabled. If you are using `Oh My Zsh <https://ohmyz.sh/>`_, this is probably already the case. Otherwise, please refer to the `zsh manual <http://zsh.sourceforge.net/Doc/Release/Completion-System.html>`_ for more details, or Just Google It™ since it will probably be easier.
+
+
 Installation
 ============
 
