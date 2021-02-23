@@ -35,7 +35,9 @@ Installation
 
 Restart ``zsh`` after the installation is complete.
 
-**Note**: Removing the package will leave residual files in your system. This is currently unavoidable, since ``pip`` is not aware of these files. For those who want to clean up their system, take a look at the source of ``activate_pyzshcomplete``
+**NOTE 1**: The path to ``activate_pyzshcomplete`` will differ depending on where pip installs packages, and it may not be in your ``PATH``, so you will have to find it.
+
+**Note 2**: Removing the package will leave residual files in your system. This is currently unavoidable, since ``pip`` is not aware of these files. For those who want to clean up their system, take a look at the source of ``activate_pyzshcomplete``
 
 Usage
 =====
