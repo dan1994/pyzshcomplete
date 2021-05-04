@@ -8,7 +8,7 @@ from os.path import join
 
 setup(
     name='pyzshcomplete',
-    version='1.0.2',
+    version='1.0.3',
     description='Tab completion for arbitraty python scripts in zsh',
     long_description=open('README.rst').read(),
     long_description_content_type='text/x-rst',
