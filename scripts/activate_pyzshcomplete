@@ -24,7 +24,7 @@ def avoid_running_as_super_user_implicitly():
     if geteuid() == 0:
         if input('You seem to be running as a super user. If you have a user '
                 'account for which you would like to activate pyzshcomplete, '
-                'you should run this script from that user. Root priviledges '
+                'you should run this script from that user. Root privileges '
                 'will be asked for when needed. \nContinue? [y/N] ').lower() \
                     != 'y':
             print('Aborting...')
