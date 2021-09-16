@@ -74,8 +74,6 @@ __pyzshcomplete_find_script_path() {
     fi
 }
 
-_python_script "$@"
-
 ### The following code is taken from the argcomplete project, including
 ### original copyright. Changes from the original will be marked by a comment
 ### Starting with CHANGE.
@@ -107,3 +105,7 @@ __python_argcomplete_scan_head() {
 __python_argcomplete_scan_head_noerr() {
     __python_argcomplete_scan_head "$@" 2>/dev/null
 }
+
+### End of argcomplete code
+
+_python_script "$@"
