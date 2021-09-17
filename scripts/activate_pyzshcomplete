@@ -1,62 +1,45 @@
 #!/usr/bin/python3
 
 from os.path import join, dirname, expanduser
-from os import remove, geteuid, walk
-from subprocess import run, Popen, PIPE
+from os import remove, geteuid
 from sys import stderr, exit
 from glob import glob
 
 
 def main():
     try:
+        print_notices()
         avoid_running_as_super_user_implicitly()
-        completion_script_dir = find_completion_script_dir()
-        copy_completion_scripts(completion_script_dir)
         remove_completion_system_cache_files()
-        print_success_message()
+        print_addition_to_zshrc()
     except Exception as e:
-        stderr.write('An error occured during installation: {}\n'.
-            format(str(e)))
+        stderr.write('An error occured during activation: {}\n'.
+                     format(str(e)))
         exit(-1)
+
+
+def print_notices():
+    print('Activating pyzshcomplete...')
+    print('NOTE 1: This activation is per user.')
+    print('NOTE 2: It is preferable to always use the same pyzshcomplete '
+          'version across virtual environments and the global environment for a '
+          'specific user, since there are shared assets across all '
+          'installations.\n')
 
 
 def avoid_running_as_super_user_implicitly():
     if geteuid() == 0:
         if input('You seem to be running as a super user. If you have a user '
-                'account for which you would like to activate pyzshcomplete, '
-                'you should run this script from that user. Root privileges '
-                'will be asked for when needed. \nContinue? [y/N] ').lower() \
-                    != 'y':
+                 'account for which you would like to activate pyzshcomplete, '
+                 'you should run this script from that user.\nContinue? '
+                 '[y/N] ') .lower() != 'y':
             print('Aborting...')
             exit(0)
         print('Continuing...')
 
 
-def find_completion_script_dir():
-    print('Locating zsh completion script directory...')
-
-    result = Popen(['echo $FPATH'], shell=True, executable='zsh', stdout=PIPE)
-    fpath = result.stdout.read().decode('ascii').strip()
-
-    for path in fpath.split(':'):
-        for root, _, files in walk(path):
-            if '_python' in files:
-                print(f'Installing in {root}')
-                return root
-
-    raise RuntimeError('Can\'t find zsh completion folder. If you see this '
-                        'error, please report it on the pyzshcomplete issue '
-                        'tracker.\n')
-
-
-def copy_completion_scripts(target_dir):
-    print('Copying completion scripts... ')
-    scripts = get_completion_scripts()
-    perform_copy_as_root(scripts, target_dir)
-
-
 def remove_completion_system_cache_files():
-    print('Removing completion system cache files... ')
+    print('Removing completion system cache files...')
     zsh_completion_cache_files = glob(expanduser('~/.zcompdump*'))
     for cache_file in zsh_completion_cache_files:
         try:
@@ -66,12 +49,16 @@ def remove_completion_system_cache_files():
                          'try to remove it manually.'.format(cache_file))
 
 
-def print_success_message():
-    print('pyzshcomplete was activated successfully!')
-    print('Restart zsh for changes to take effect')
+def print_addition_to_zshrc():
+    print('Please add the following line to the begining of your .zshrc '
+          '(anywhere before calling autoload): ')
+    print('fpath=({} $fpath)'.format(get_completion_scripts_dir()))
+    input('Press any key to continue...')
+    print('Please restart zsh for changes to take effect')
+    print('NOTE: Sourcing .zshrc is not enough')
 
 
-def get_completion_scripts():
+def get_completion_scripts_dir():
     try:
         import pyzshcomplete
     except ImportError as e:
@@ -79,16 +66,7 @@ def get_completion_scripts():
                           'running the activation script'.format(str(e)))
 
     pyzshcomplete_root_dir = dirname(pyzshcomplete.__file__)
-    zsh_scripts_dir = join(pyzshcomplete_root_dir, 'zsh_scripts')
-    return ' '.join(glob(join(zsh_scripts_dir, '*')))
-
-
-def perform_copy_as_root(source, target):
-    commandline = 'sudo cp {} {}'.format(source, target)
-    if run(commandline.split()).returncode != 0:
-        raise RuntimeError('Failed copying zsh completion scripts. Make sure '
-                           'to provide root access, as these files are copied '
-                           'to a global zsh dir owned by root\n')
+    return join(pyzshcomplete_root_dir, 'zsh_scripts')
 
 
 if __name__ == '__main__':
