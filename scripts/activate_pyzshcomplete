@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import os
 from os.path import join, dirname, expanduser
 from os import remove, geteuid, walk
 from subprocess import run, Popen, PIPE
@@ -52,7 +53,7 @@ def find_completion_script_dir():
 def copy_completion_scripts(target_dir):
     print('Copying completion scripts... ')
     scripts = get_completion_scripts()
-    perform_copy_as_root(scripts, target_dir)
+    perform_copy(scripts, target_dir, not os.access(target_dir, os.W_OK))
 
 
 def remove_completion_system_cache_files():
@@ -83,8 +84,8 @@ def get_completion_scripts():
     return ' '.join(glob(join(zsh_scripts_dir, '*')))
 
 
-def perform_copy_as_root(source, target):
-    commandline = 'sudo cp {} {}'.format(source, target)
+def perform_copy(source, target, as_root = False):
+    commandline = f'{"sudo " if as_root else "" }cp {source} {target}'
     if run(commandline.split()).returncode != 0:
         raise RuntimeError('Failed copying zsh completion scripts. Make sure '
                            'to provide root access, as these files are copied '
