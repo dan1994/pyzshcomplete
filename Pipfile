@@ -5,7 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
-pytest = "*"
+pytest = ">=6.2.5"
 ipython = "*"
 autopep8 = "*"
 sphinx = "*"
