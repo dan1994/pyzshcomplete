@@ -245,7 +245,7 @@ class ArgumentAdapter(ArgumentAdapterInterface):
         return self.name
 
     def _escaped_help(self):
-        return self.help.replace(r':', r'\:').replace('\n', ' ')
+        return self.help.replace(r':', r'\:').replace('\n', ' ').replace('[', '\[').replace(']', '\]')
 
     def _is_optional_to_string(self):
         return ZshConstants.OPTIONAL_ARGUMENT if self.is_optional else ''
